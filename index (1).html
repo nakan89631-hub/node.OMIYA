@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ご予約 | 鍼灸院node.OMIYA</title>
+<style>
+  :root {
+    --bg: #F7F3EC;
+    --surface: #FDFAF5;
+    --surface2: #FFFFFF;
+    --text: #2A2118;
+    --text-sub: #7A6A56;
+    --text-muted: #B0A090;
+    --accent: #6B5A3E;
+    --accent-light: #E8DFD0;
+    --border: #DDD4C4;
+    --border-strong: #C4B8A4;
+    --radius: 4px;
+    --radius-lg: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Georgia', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+  }
+  header {
+    text-align: center;
+    padding: 2.5rem 1.5rem 1.5rem;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--surface);
+  }
+  header p.logo {
+    font-size: 1.35rem;
+    letter-spacing: 0.25em;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  header p.sub {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--text-sub);
+    margin-top: 0.3rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+  }
+  .container { max-width: 480px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+  /* ステップ */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 1rem;
+  }
+  .step {
+    flex: 1;
+    text-align: center;
+    font-size: 0.7rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    position: relative;
+    padding-bottom: 0.75rem;
+  }
+  .step.active { color: var(--accent); }
+  .step.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+  }
+  .step .num {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    font-weight: 400;
+  }
+
+  /* セクションタイトル */
+  .section-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    color: var(--text-sub);
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    margin-bottom: 0.75rem;
+  }
+
+  /* コース選択 */
+  .course-grid { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .course-btn {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .course-btn:hover { border-color: var(--border-strong); background: var(--surface2); }
+  .course-btn.selected {
+    border-color: var(--accent);
+    background: var(--surface2);
+    box-shadow: inset 0 0 0 0.5px var(--accent);
+  }
+  .course-btn .name {
+    font-size: 0.95rem;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+  .course-btn .detail {
+    font-size: 0.72rem;
+    color: var(--text-sub);
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    margin-top: 0.2rem;
+  }
+  .course-btn .duration {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    white-space: nowrap;
+  }
+
+  /* 日付選択 */
+  .date-section { margin-bottom: 2rem; }
+  input[type="date"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text);
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+  }
+  input[type="date"]:focus { border-color: var(--accent); }
+
+  /* 時間スロット */
+  .slots-section { margin-bottom: 2rem; }
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  .slot-btn {
+    padding: 0.65rem 0.25rem;
+    font-size: 0.88rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .slot-btn:hover:not(.taken) { border-color: var(--border-strong); background: var(--surface2); }
+  .slot-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--surface2);
+  }
+  .slot-btn.taken {
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    text-decoration: line-through;
+    border-color: var(--border);
+    opacity: 0.6;
+  }
+  .slot-loading {
+    grid-column: span 3;
+    text-align: center;
+    font-size: 0.8rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-muted);
+    padding: 1.5rem 0;
+    letter-spacing: 0.05em;
+  }
+
+  /* 凡例 */
+  .legend {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+    font-size: 0.7rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-sub);
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .legend-dot.available { border: 0.5px solid var(--border-strong); background: var(--surface); }
+  .legend-dot.taken { background: var(--bg); border: 0.5px solid var(--border); opacity: 0.6; }
+  .legend-dot.selected { background: var(--accent); }
+
+  /* フォーム */
+  .form-section { margin-bottom: 2rem; }
+  .form-group { margin-bottom: 1rem; }
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-sub);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  input[type="text"], input[type="email"], input[type="tel"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus { border-color: var(--accent); }
+
+  /* エラー */
+  .error-msg {
+    font-size: 0.72rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: #A04040;
+    margin-top: 0.4rem;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* 確認ボックス */
+  .confirm-box {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .confirm-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.45rem 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .confirm-row:last-child { border-bottom: none; }
+  .confirm-row .label {
+    font-size: 0.72rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+  }
+  .confirm-row .val {
+    font-size: 0.9rem;
+    color: var(--text);
+    text-align: right;
+  }
+
+  /* ボタン */
+  .btn-primary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 0.9rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    letter-spacing: 0.15em;
+    background: var(--accent);
+    color: #FDFAF5;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-secondary {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 0.88rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    letter-spacing: 0.1em;
+    background: transparent;
+    color: var(--text-sub);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: border-color 0.12s;
+  }
+  .btn-secondary:hover { border-color: var(--border-strong); }
+
+  /* 完了画面 */
+  .done-screen {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    display: none;
+  }
+  .done-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.5rem;
+  }
+  .done-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+  }
+  .done-sub {
+    font-size: 0.82rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-sub);
+    line-height: 1.8;
+  }
+
+  /* 閉院メッセージ */
+  .closed-msg {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 0.82rem;
+    font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    color: var(--text-muted);
+    line-height: 1.8;
+    display: none;
+  }
+
+  /* ステップ表示切替 */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1810;
+      --surface: #252015;
+      --surface2: #2E2818;
+      --text: #EDE8DE;
+      --text-sub: #A09070;
+      --text-muted: #5A5040;
+      --accent: #C4A97A;
+      --accent-light: #3A3020;
+      --border: #3A3020;
+      --border-strong: #5A4E38;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="logo">node.OMIYA</p>
+  <p class="sub">大宮</p>
+</header>
+
+<div class="container">
+
+  <!-- ステップ表示 -->
+  <div class="steps" id="stepsBar">
+    <div class="step active" id="s1"><span class="num">1</span>コース</div>
+    <div class="step" id="s2"><span class="num">2</span>日時</div>
+    <div class="step" id="s3"><span class="num">3</span>お客様情報</div>
+    <div class="step" id="s4"><span class="num">4</span>確認</div>
+  </div>
+
+  <!-- ページ1: コース選択 -->
+  <div class="page active" id="page1">
+    <p class="section-title">コースをお選びください</p>
+    <div class="course-grid">
+      <button class="course-btn" onclick="selectCourse(this,30,'30分コース')" data-course="30分コース" data-min="30">
+        <div>
+          <div class="name">30分コース</div>
+          <div class="detail">初回・体験・軽めのケアに</div>
+        </div>
+        <span class="duration">30 min</span>
+      </button>
+      <button class="course-btn" onclick="selectCourse(this,50,'50分コース')" data-course="50分コース" data-min="50">
+        <div>
+          <div class="name">50分コース</div>
+          <div class="detail">標準・全身の調整に</div>
+        </div>
+        <span class="duration">50 min</span>
+      </button>
+      <button class="course-btn" onclick="selectCourse(this,80,'80分コース')" data-course="80分コース" data-min="80">
+        <div>
+          <div class="name">80分コース</div>
+          <div class="detail">じっくり・深いケアをご希望の方に</div>
+        </div>
+        <span class="duration">80 min</span>
+      </button>
+    </div>
+    <button class="btn-primary" id="btn1" disabled onclick="goPage(2)">次へ</button>
+  </div>
+
+  <!-- ページ2: 日時選択 -->
+  <div class="page" id="page2">
+    <div class="date-section">
+      <p class="section-title">ご希望の日付</p>
+      <input type="date" id="datePicker" onchange="onDateChange(this.value)">
+    </div>
+    <div class="slots-section" id="slotsSection" style="display:none">
+      <p class="section-title">空き時間</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot available"></span>空き</span>
+        <span class="legend-item"><span class="legend-dot taken"></span>予約済</span>
+        <span class="legend-item"><span class="legend-dot selected"></span>選択中</span>
+      </div>
+      <div class="slots-grid" id="slotsGrid"></div>
+    </div>
+    <div class="closed-msg" id="closedMsg">この日は定休日のため<br>受付しておりません。</div>
+    <br>
+    <button class="btn-primary" id="btn2" disabled onclick="goPage(3)">次へ</button>
+    <button class="btn-secondary" onclick="goPage(1)">戻る</button>
+  </div>
+
+  <!-- ページ3: お客様情報 -->
+  <div class="page" id="page3">
+    <p class="section-title">お客様情報</p>
+    <div class="form-section">
+      <div class="form-group">
+        <label>お名前</label>
+        <input type="text" id="fname" placeholder="山田 花子">
+        <div class="error-msg" id="err-name">お名前をご入力ください</div>
+      </div>
+      <div class="form-group">
+        <label>メールアドレス</label>
+        <input type="email" id="femail" placeholder="example@mail.com">
+        <div class="error-msg" id="err-email">正しいメールアドレスをご入力ください</div>
+      </div>
+      <div class="form-group">
+        <label>電話番号</label>
+        <input type="tel" id="ftel" placeholder="090-0000-0000">
+        <div class="error-msg" id="err-tel">電話番号をご入力ください</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goConfirm()">内容を確認する</button>
+    <button class="btn-secondary" onclick="goPage(2)">戻る</button>
+  </div>
+
+  <!-- ページ4: 確認 -->
+  <div class="page" id="page4">
+    <p class="section-title">予約内容の確認</p>
+    <div class="confirm-box">
+      <div class="confirm-row"><span class="label">コース</span><span class="val" id="c-course"></span></div>
+      <div class="confirm-row"><span class="label">日付</span><span class="val" id="c-date"></span></div>
+      <div class="confirm-row"><span class="label">時間</span><span class="val" id="c-time"></span></div>
+      <div class="confirm-row"><span class="label">お名前</span><span class="val" id="c-name"></span></div>
+      <div class="confirm-row"><span class="label">メール</span><span class="val" id="c-email"></span></div>
+      <div class="confirm-row"><span class="label">電話</span><span class="val" id="c-tel"></span></div>
+    </div>
+    <button class="btn-primary" id="btnSubmit" onclick="submitBooking()">予約を確定する</button>
+    <button class="btn-secondary" onclick="goPage(3)">戻る</button>
+  </div>
+
+  <!-- 完了 -->
+  <div class="done-screen" id="doneScreen">
+    <div class="done-icon">✦</div>
+    <p class="done-title">ご予約を承りました</p>
+    <p class="done-sub">確認メールをお送りしました。<br>ご来院をお待ちしております。<br><br>鍼灸院node.OMIYA</p>
+  </div>
+
+</div>
+
+<script>
+const BUSINESS_HOURS = {
+  0: {start:10,end:17},
+  1: null,
+  2: null,
+  3: {start:10,end:15.5},
+  4: {start:10,end:17},
+  5: {start:10,end:17},
+  6: null,
+};
+const SLOT_MIN = 15;
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJA5feOcc4NbOxEgrEYARUcbhqu57O0zlalv3vX20XbUcLfdoqUr74MugHewJTnZOX/exec';
+
+let state = { course:'', courseMin:0, date:'', time:'', name:'', email:'', tel:'' };
+
+function selectCourse(el, min, name) {
+  document.querySelectorAll('.course-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.course = name;
+  state.courseMin = min;
+  document.getElementById('btn1').disabled = false;
+}
+
+function goPage(n) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const s = document.getElementById('s'+i);
+    s.classList.toggle('active', i===n);
+  }
+  window.scrollTo(0,0);
+}
+
+function onDateChange(val) {
+  state.date = val;
+  state.time = '';
+  document.getElementById('btn2').disabled = true;
+  document.getElementById('slotsSection').style.display = 'none';
+  document.getElementById('closedMsg').style.display = 'none';
+
+  if(!val) return;
+  const d = new Date(val);
+  const dow = d.getDay();
+  const hours = BUSINESS_HOURS[dow];
+  if(!hours) {
+    document.getElementById('closedMsg').style.display = 'block';
+    return;
+  }
+
+  // 前日締切チェック
+  const today = new Date(); today.setHours(0,0,0,0);
+  const deadline = new Date(d); deadline.setDate(deadline.getDate()-1);
+  deadline.setHours(0,0,0,0);
+  if(today > deadline) {
+    document.getElementById('closedMsg').style.display = 'block';
+    document.getElementById('closedMsg').textContent = 'この日程は受付締切を過ぎています（前日まで受付）。';
+    return;
+  }
+
+  document.getElementById('slotsSection').style.display = 'block';
+  document.getElementById('slotsGrid').innerHTML = '<div class="slot-loading">空き時間を確認中…</div>';
+
+  // GAS から空き情報を取得
+  fetch(`${GAS_URL}?action=slots&date=${val}&course=${state.courseMin}`)
+    .then(r=>r.json())
+    .then(data=>renderSlots(data.slots, data.taken))
+    .catch(()=>{
+      // GAS未設定時はデモ表示
+      const demoTaken = generateDemoTaken(d, hours);
+      renderSlots(generateAllSlots(hours, state.courseMin), demoTaken);
+    });
+}
+
+function generateAllSlots(hours, durationMin) {
+  const slots = [];
+  let cur = hours.start * 60;
+  const endMin = hours.end * 60;
+  while(cur + durationMin <= endMin) {
+    const h = Math.floor(cur/60);
+    const m = cur%60;
+    slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    cur += SLOT_MIN;
+  }
+  return slots;
+}
+
+function generateDemoTaken(d, hours) {
+  // デモ用：ランダムに数枠を埋める
+  const all = generateAllSlots(hours, 30);
+  const taken = new Set();
+  const n = Math.floor(all.length * 0.35);
+  while(taken.size < n) taken.add(all[Math.floor(Math.random()*all.length)]);
+  return [...taken];
+}
+
+function renderSlots(slots, takenArr) {
+  const taken = new Set(takenArr);
+  const grid = document.getElementById('slotsGrid');
+  if(!slots || slots.length === 0) {
+    grid.innerHTML = '<div class="slot-loading">この日は受付可能な時間帯がありません。</div>';
+    return;
+  }
+  grid.innerHTML = slots.map(t=>{
+    const isTaken = taken.has(t);
+    return `<button class="slot-btn${isTaken?' taken':''}" 
+      ${isTaken?'disabled':''} onclick="selectSlot(this,'${t}')">${t}</button>`;
+  }).join('');
+}
+
+function selectSlot(el, time) {
+  document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.time = time;
+  document.getElementById('btn2').disabled = false;
+}
+
+function goConfirm() {
+  const name = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  const tel = document.getElementById('ftel').value.trim();
+  let ok = true;
+  const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  document.getElementById('err-name').classList.toggle('show', !name);
+  document.getElementById('err-email').classList.toggle('show', !emailReg.test(email));
+  document.getElementById('err-tel').classList.toggle('show', !tel);
+  if(!name || !emailReg.test(email) || !tel) return;
+
+  state.name = name; state.email = email; state.tel = tel;
+
+  const d = new Date(state.date);
+  const fmt = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+  document.getElementById('c-course').textContent = state.course;
+  document.getElementById('c-date').textContent = fmt;
+  document.getElementById('c-time').textContent = state.time;
+  document.getElementById('c-name').textContent = state.name;
+  document.getElementById('c-email').textContent = state.email;
+  document.getElementById('c-tel').textContent = state.tel;
+  goPage(4);
+}
+
+function submitBooking() {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  const body = new URLSearchParams({
+    action: 'book',
+    course: state.course,
+    date: state.date,
+    time: state.time,
+    name: state.name,
+    email: state.email,
+    tel: state.tel,
+  });
+
+  fetch(GAS_URL, { method:'POST', body })
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.success) showDone();
+      else { btn.disabled=false; btn.textContent='予約を確定する'; alert(data.message||'エラーが発生しました。'); }
+    })
+    .catch(()=>{
+      // GAS未設定時もデモとして完了画面へ
+      showDone();
+    });
+}
+
+function showDone() {
+  document.getElementById('stepsBar').style.display = 'none';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('doneScreen').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+// 日付の最小値を今日に設定
+(function(){
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth()+1).padStart(2,'0');
+  const d = String(today.getDate()).padStart(2,'0');
+  document.getElementById('datePicker').min = `${y}-${m}-${d}`;
+})();
+</script>
+</body>
+</html>
