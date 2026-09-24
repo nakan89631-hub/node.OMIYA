@@ -49,6 +49,15 @@
   .course-btn .detail { font-size: 0.72rem; color: var(--text-sub); font-family: var(--sans); margin-top: 0.2rem; }
   .course-btn .duration { font-size: 0.8rem; color: var(--text-sub); font-family: var(--sans); white-space: nowrap; }
 
+  .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .option-btn { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 0.75rem 0.8rem; cursor: pointer; text-align: left; color: var(--text); font-family: var(--sans); }
+  .option-btn .oname { display: block; font-size: 0.82rem; }
+  .option-btn .ometa { display: block; font-size: 0.68rem; color: var(--text-sub); margin-top: 0.2rem; }
+  .option-btn.selected { border-color: var(--accent); background: var(--surface2); box-shadow: inset 0 0 0 0.5px var(--accent); }
+  .option-btn.selected .oname::before { content: '✓ '; color: var(--accent); }
+  .option-note { font-size: 0.68rem; font-family: var(--sans); color: var(--text-muted); margin-bottom: 1rem; }
+  .option-total { background: var(--accent-light); border-radius: var(--radius-lg); padding: 0.7rem 1rem; font-size: 0.8rem; font-family: var(--sans); color: var(--accent); text-align: center; margin-bottom: 1.5rem; display: none; }
+
   .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
   .week-nav button { background: none; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.75rem; font-size: 0.8rem; font-family: var(--sans); color: var(--text-sub); cursor: pointer; }
   .week-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -82,7 +91,10 @@
   .form-group { margin-bottom: 1rem; }
   label { display: block; font-size: 0.72rem; font-family: var(--sans); color: var(--text-sub); letter-spacing: 0.1em; margin-bottom: 0.4rem; }
   input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; font-family: var(--sans); border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); outline: none; }
-  input:focus { border-color: var(--accent); }
+  textarea { width: 100%; min-height: 110px; padding: 0.75rem 1rem; font-size: 1rem; font-family: var(--sans); line-height: 1.6; border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); outline: none; resize: vertical; }
+  input:focus, textarea:focus { border-color: var(--accent); }
+  .optional { color: var(--text-muted); margin-left: 0.3rem; }
+  .char-count { font-size: 0.68rem; font-family: var(--sans); color: var(--text-muted); text-align: right; margin-top: 0.3rem; }
   .error-msg { font-size: 0.72rem; font-family: var(--sans); color: #A04040; margin-top: 0.4rem; display: none; }
   .error-msg.show { display: block; }
 
@@ -110,7 +122,7 @@
 <header>
   <p class="logo">鍼灸院node.OMIYA</p>
   <p class="sub">さいたま市大宮区大成町3－641</p>
-    <p class="sub">鉄道博物館駅から徒歩8分　近隣にコインパーキングあり</p>
+   <p class="sub">鉄道博物館駅から徒歩8分　近隣にコインパーキングあり</p>
 </header>
 
 <div class="container">
@@ -126,18 +138,22 @@
     <p class="section-title">コースをお選びください</p>
     <div class="course-grid">
       <button class="course-btn" onclick="selectCourse(this, 30, '30分コース')">
-        <div><div class="name">30分コース</div><div class="detail">お急ぎの方向け。気になる部位を絞って施術します。</div></div>
-        <span class="duration">30 min</span>
+        <div><div class="name">30分コース</div><div class="detail">お急ぎの方向け。気になる部位に絞って施術します。</div></div>
+        <span class="duration">30分 ／ 4,500円</span>
       </button>
       <button class="course-btn" onclick="selectCourse(this, 50, '50分コース')">
         <div><div class="name">50分コース</div><div class="detail">【おすすめ！】標準的なコース。お悩みの症状を中心に全身のバランスを整えます。</div></div>
-        <span class="duration">50 min</span>
+        <span class="duration">50分 ／ 6,500円</span>
       </button>
       <button class="course-btn" onclick="selectCourse(this, 80, '80分コース')">
-        <div><div class="name">80分コース</div><div class="detail">しっかり全身コース。複数のお悩みがある方、慢性的な不調、疲労や緊張が強い方向け</div></div>
-        <span class="duration">80 min</span>
+        <div><div class="name">80分コース</div><div class="detail">しっかり全身コース。複数のお悩みがある方、慢性的な不調、慰労や緊張が強い方向け。</div></div>
+        <span class="duration">80分 ／ 9,000円</span>
       </button>
     </div>
+    <p class="section-title">オプション（任意・複数可）</p>
+    <div class="option-grid" id="optionGrid"></div>
+    <p class="option-note">※鍼追加は2倍・3倍のどちらか1つをお選びいただけます</p>
+    <div class="option-total" id="optionTotal"></div>
     <button class="btn-primary" id="btn1" disabled onclick="goPage(2)">次へ</button>
   </div>
 
@@ -182,6 +198,11 @@
       <input type="tel" id="ftel" placeholder="090-0000-0000" autocomplete="tel">
       <div class="error-msg" id="err-tel">電話番号をご入力ください</div>
     </div>
+    <div class="form-group">
+      <label for="fsymptoms">お悩みの症状<span class="optional">（任意）</span></label>
+      <textarea id="fsymptoms" maxlength="1000" placeholder="例：寝つきが悪い、肩こりがつらい、疲れが取れない など"></textarea>
+      <div class="char-count"><span id="symCount">0</span> / 1000</div>
+    </div>
     <br>
     <button class="btn-primary" onclick="goConfirm()">内容を確認する</button>
     <button class="btn-secondary" onclick="goPage(2)">戻る</button>
@@ -192,11 +213,15 @@
     <p class="section-title">予約内容の確認</p>
     <div class="confirm-box">
       <div class="confirm-row"><span class="label">コース</span><span class="val" id="c-course"></span></div>
+      <div class="confirm-row"><span class="label">オプション</span><span class="val" id="c-options"></span></div>
+      <div class="confirm-row"><span class="label">施術時間</span><span class="val" id="c-duration"></span></div>
+      <div class="confirm-row"><span class="label">料金合計</span><span class="val" id="c-price"></span></div>
       <div class="confirm-row"><span class="label">日付</span><span class="val" id="c-date"></span></div>
       <div class="confirm-row"><span class="label">時間</span><span class="val" id="c-time"></span></div>
       <div class="confirm-row"><span class="label">お名前</span><span class="val" id="c-name"></span></div>
       <div class="confirm-row"><span class="label">メール</span><span class="val" id="c-email"></span></div>
       <div class="confirm-row"><span class="label">電話</span><span class="val" id="c-tel"></span></div>
+      <div class="confirm-row"><span class="label">お悩みの症状</span><span class="val" id="c-symptoms" style="white-space:pre-wrap;text-align:left;"></span></div>
     </div>
     <button class="btn-primary" id="btnSubmit" onclick="submitBooking()">予約を確定する</button>
     <button class="btn-secondary" onclick="goPage(3)">戻る</button>
@@ -224,11 +249,26 @@ const BUSINESS_HOURS = {
   6: null,
 };
 const SLOT_MIN = 15;
+const COURSE_PRICES = { '30分コース': 4500, '50分コース': 6500, '80分コース': 9000 };
+// オプション（group が同じものはどちらか1つだけ）
+const OPTIONS = [
+  { name: '鍼追加2倍',        min: 10, price: 500,  group: 'hari' },
+  { name: '鍼追加3倍',        min: 10, price: 1000, group: 'hari' },
+  { name: '美容鍼',           min: 15, price: 2000 },
+  { name: 'ドライヘッドスパ', min: 10, price: 1000 },
+];
 const BED_KEYS = ['bed1', 'bed2', 'bed3'];
 // ---- 設定ここまで ----
 
 const DOW = ['日', '月', '火', '水', '木', '金', '土'];
-const state = { course: '', courseMin: 0, date: '', time: '', name: '', email: '', tel: '' };
+const state = { course: '', courseMin: 0, options: [], date: '', time: '', name: '', email: '', tel: '', symptoms: '' };
+const selectedOpts = () => OPTIONS.filter(o => state.options.includes(o.name));
+const totalMin = () => state.courseMin + selectedOpts().reduce((a, o) => a + o.min, 0);
+const optPrice = () => selectedOpts().reduce((a, o) => a + o.price, 0);
+const coursePrice = () => COURSE_PRICES[state.course] || 0;
+const totalPrice = () => coursePrice() + optPrice();
+const optLabel = () => selectedOpts().map(o => o.name).join('・');
+const yen = n => n.toLocaleString('ja-JP') + '円';
 let weekOffset = 0;
 let renderToken = 0;
 const busyPromise = {};  // 週の開始日 → 通信中/完了のPromise
@@ -283,6 +323,41 @@ function selectCourse(el, min, name) {
   state.date = '';
   state.time = '';
   $('btn1').disabled = false;
+  updateOptionTotal();
+}
+
+function renderOptions() {
+  $('optionGrid').innerHTML = OPTIONS.map(o => `
+    <button class="option-btn${state.options.includes(o.name) ? ' selected' : ''}" data-opt="${o.name}">
+      <span class="oname">${o.name}</span>
+      <span class="ometa">＋${o.min}分 ／ ${yen(o.price)}</span>
+    </button>`).join('');
+}
+
+$('optionGrid').addEventListener('click', e => {
+  const btn = e.target.closest('.option-btn');
+  if (!btn) return;
+  const opt = OPTIONS.find(o => o.name === btn.dataset.opt);
+  if (state.options.includes(opt.name)) {
+    state.options = state.options.filter(n => n !== opt.name);
+  } else {
+    if (opt.group) {
+      const same = OPTIONS.filter(o => o.group === opt.group).map(o => o.name);
+      state.options = state.options.filter(n => !same.includes(n));
+    }
+    state.options.push(opt.name);
+  }
+  state.date = '';
+  state.time = '';
+  renderOptions();
+  updateOptionTotal();
+});
+
+function updateOptionTotal() {
+  const box = $('optionTotal');
+  if (!state.courseMin) { box.style.display = 'none'; return; }
+  box.textContent = `施術時間 ${totalMin()}分　／　料金合計 ${yen(totalPrice())}`;
+  box.style.display = 'block';
 }
 
 function goPage(n, force) {
@@ -294,7 +369,8 @@ function goPage(n, force) {
   if (n === 3 && state.date) {
     const d = new Date(state.date + 'T00:00:00');
     $('page3SlotInfo').textContent =
-      `${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）${state.time}〜　${state.course}`;
+      `${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）${state.time}〜　${state.course}` +
+      (state.options.length ? `＋${optLabel()}` : '') + `（${totalMin()}分・${yen(totalPrice())}）`;
   }
 }
 
@@ -329,7 +405,7 @@ async function renderWeek(force) {
 
 function drawTable(days, busy) {
   const today = todayStr();
-  const dur = state.courseMin || 30;
+  const dur = totalMin() || 30;
 
   // 表示する時間行（どこかの営業日で収まる枠だけ）
   let minStart = Infinity, maxEnd = 0;
@@ -396,15 +472,20 @@ function goConfirm() {
   $('err-email').classList.toggle('show', !emailOk);
   $('err-tel').classList.toggle('show', !tel);
   if (!name || !emailOk || !tel) return;
-  Object.assign(state, { name, email, tel });
+  const symptoms = $('fsymptoms').value.trim();
+  Object.assign(state, { name, email, tel, symptoms });
 
   const d = new Date(state.date + 'T00:00:00');
-  $('c-course').textContent = state.course;
+  $('c-course').textContent = `${state.course}（${yen(coursePrice())}）`;
+  $('c-price').textContent = yen(totalPrice());
+  $('c-options').textContent = state.options.length ? `${optLabel()}（${yen(optPrice())}）` : 'なし';
+  $('c-duration').textContent = `${totalMin()}分`;
   $('c-date').textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）`;
   $('c-time').textContent = `${state.time}〜`;
   $('c-name').textContent = name;
   $('c-email').textContent = email;
   $('c-tel').textContent = tel;
+  $('c-symptoms').textContent = symptoms || '記入なし';
   goPage(4);
 }
 
@@ -416,8 +497,8 @@ async function submitBooking() {
     const res = await fetch(GAS_URL, {
       method: 'POST',
       body: new URLSearchParams({
-        name: state.name, email: state.email, tel: state.tel,
-        course: state.course, date: state.date, time: state.time,
+        name: state.name, email: state.email, tel: state.tel, symptoms: state.symptoms,
+        course: state.course, options: state.options.join(','), date: state.date, time: state.time,
       }),
     });
     const data = await res.json();
@@ -439,6 +520,9 @@ function showDone() {
   $('doneScreen').style.display = 'block';
   window.scrollTo(0, 0);
 }
+
+renderOptions();
+$('fsymptoms').addEventListener('input', e => { $('symCount').textContent = e.target.value.length; });
 
 // ページを開いた瞬間に今週分の読み込みを開始
 loadBusy(0).catch(() => {});
