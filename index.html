@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -8,18 +7,18 @@
 <style>
   :root {
     --bg: #F7F3EC; --surface: #FDFAF5; --surface2: #FFFFFF;
-    --text: #2A2118; --text-sub: #7A6A56; --text-muted: #B0A090;
+    --text: #2A2118; --text-sub: #5C4C38; --text-muted: #8C7C68;
     --accent: #6B5A3E; --accent-light: #E8DFD0;
-    --border: #DDD4C4; --border-strong: #C4B8A4;
+    --border: #D2C7B4; --border-strong: #B3A48C;
     --radius: 4px; --radius-lg: 8px;
     --sans: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1C1810; --surface: #252015; --surface2: #2E2818;
-      --text: #EDE8DE; --text-sub: #A09070; --text-muted: #5A5040;
+      --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
       --accent: #C4A97A; --accent-light: #3A3020;
-      --border: #3A3020; --border-strong: #5A4E38;
+      --border: #4A3F2C; --border-strong: #6E6048;
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,6 +66,7 @@
   .cal-legend .mk { color: var(--accent); margin-right: 0.3rem; }
   .cal-legend .mk.x { color: var(--text-muted); }
 
+  .open-note { font-size: 0.88rem; font-family: var(--sans); color: var(--text-sub); margin-bottom: 0.75rem; }
   .cal-box { position: relative; min-height: 220px; margin-bottom: 1.5rem; }
   .cal-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .cal-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 0.75rem; }
@@ -115,6 +115,46 @@
 
   .page { display: none; }
   .page.active { display: block; }
+
+  /* ===== 読みやすさ調整 ===== */
+  body { line-height: 1.6; }
+  .container { max-width: 600px; }
+  header .logo { font-size: 1.65rem; }
+  header .sub { font-size: 0.88rem; }
+  .step { font-size: 0.85rem; font-weight: 600; }
+  .step .num { font-size: 1.2rem; }
+  .section-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; color: var(--text); margin-bottom: 0.9rem; }
+  .course-btn, .option-btn { border-width: 1px; }
+  .course-btn .name { font-size: 1.15rem; font-weight: 600; }
+  .course-btn .detail { font-size: 0.88rem; }
+  .course-btn .duration { font-size: 0.95rem; font-weight: 600; color: var(--accent); }
+  .option-btn .oname { font-size: 0.98rem; font-weight: 600; }
+  .option-btn .ometa { font-size: 0.82rem; }
+  .option-note { font-size: 0.82rem; }
+  .option-total { font-size: 0.98rem; font-weight: 600; }
+  .week-nav button { font-size: 0.92rem; border-width: 1px; }
+  .week-label { font-size: 1rem; font-weight: 600; color: var(--text); }
+  .cal-legend { font-size: 0.9rem; }
+  .cal-table th .dow { font-size: 0.82rem; }
+  .cal-table th .date-num { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+  .cal-table th.closed .date-num { color: var(--text-muted); }
+  .cal-table td { height: 40px; }
+  .cal-table td.time-col { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
+  .slot { height: 40px; font-size: 1.3rem; font-weight: 700; }
+  .slot-x { font-size: 1.05rem; }
+  .cal-overlay { font-size: 1rem; font-weight: 600; }
+  .slot-info { font-size: 1rem; font-weight: 600; line-height: 1.7; }
+  label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  input[type="text"], input[type="email"], input[type="tel"], textarea { font-size: 1.05rem; border-width: 1px; }
+  .error-msg { font-size: 0.85rem; font-weight: 600; }
+  .char-count { font-size: 0.8rem; }
+  .confirm-row { padding: 0.65rem 0; }
+  .confirm-row .label { font-size: 0.88rem; font-weight: 600; }
+  .confirm-row .val { font-size: 1.02rem; }
+  .btn-primary { font-size: 1.05rem; font-weight: 600; padding: 1.1rem; }
+  .btn-secondary { font-size: 0.98rem; border-width: 1px; }
+  .done-title { font-size: 1.35rem; }
+  .done-sub { font-size: 0.98rem; }
 </style>
 </head>
 <body>
@@ -122,7 +162,7 @@
 <header>
   <p class="logo">鍼灸院node.OMIYA</p>
   <p class="sub">さいたま市大宮区大成町3－641</p>
-   <p class="sub">鉄道博物館駅から徒歩8分　近隣にコインパーキングあり</p>
+  <p class="sub">鉄道博物館駅より徒歩8分　近隣にコインパーキングあり</p>
 </header>
 
 <div class="container">
@@ -169,6 +209,7 @@
       <span><span class="mk">○</span>空き</span>
       <span><span class="mk x">×</span>予約済</span>
     </div>
+    <p class="open-note" id="openNote"></p>
     <div class="cal-box">
       <div class="cal-overlay" id="calLoading">空き状況を確認中です<br>少々お待ちください…</div>
       <div class="cal-overlay" id="calError">
@@ -199,7 +240,7 @@
       <div class="error-msg" id="err-tel">電話番号をご入力ください</div>
     </div>
     <div class="form-group">
-      <label for="fsymptoms">お悩みの症状<span class="optional">（任意）</span></label>
+      <label for="fsymptoms">お悩みの症状や連絡事項<span class="optional">（任意）</span></label>
       <textarea id="fsymptoms" maxlength="1000" placeholder="例：寝つきが悪い、肩こりがつらい、疲れが取れない など"></textarea>
       <div class="char-count"><span id="symCount">0</span> / 1000</div>
     </div>
@@ -271,6 +312,7 @@ const optLabel = () => selectedOpts().map(o => o.name).join('・');
 const yen = n => n.toLocaleString('ja-JP') + '円';
 let weekOffset = 0;
 let renderToken = 0;
+let openUntil = null;   // 予約受付の最終日（GASから取得。"" = 受付前）
 const busyPromise = {};  // 週の開始日 → 通信中/完了のPromise
 const busyData = {};     // 週の開始日 → 取得済みデータ
 
@@ -298,6 +340,7 @@ function loadBusy(offset, force) {
       .then(d => {
         if (d.error || !d.beds) throw new Error(d.error || 'bad response');
         busyData[ws] = d;
+        if ('openUntil' in d) openUntil = d.openUntil || '';
         return d;
       })
       .catch(err => { delete busyPromise[ws]; throw err; });
@@ -400,7 +443,24 @@ async function renderWeek(force) {
     $('calLoading').classList.remove('show');
   }
   drawTable(days, busy);
-  loadBusy(weekOffset + 1).catch(() => {}); // 次の週を先読み
+  updateOpenInfo();
+  if (!$('btnNextWeek').disabled) loadBusy(weekOffset + 1).catch(() => {}); // 次の週を先読み
+}
+
+function isNotOpen(ds) {
+  return openUntil !== null && (openUntil === '' || ds > openUntil);
+}
+
+function updateOpenInfo() {
+  if (openUntil === null) { $('openNote').textContent = ''; return; }
+  if (openUntil === '') {
+    $('openNote').textContent = '現在、次回のご予約受付の準備中です。恐れ入りますが、しばらくお待ちください。';
+    $('btnNextWeek').disabled = true;
+    return;
+  }
+  const d = new Date(openUntil + 'T00:00:00');
+  $('openNote').textContent = `ご予約は${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）まで受付中です`;
+  $('btnNextWeek').disabled = toDateStr(weekStart(weekOffset + 1)) > openUntil;
 }
 
 function drawTable(days, busy) {
@@ -420,7 +480,7 @@ function drawTable(days, busy) {
   let html = '<thead><tr><th></th>';
   for (const d of days) {
     const ds = toDateStr(d);
-    const closed = !BUSINESS_HOURS[d.getDay()] || ds <= today;
+    const closed = !BUSINESS_HOURS[d.getDay()] || ds <= today || isNotOpen(ds);
     html += `<th class="${closed ? 'closed' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="date-num">${d.getDate()}</span></th>`;
   }
   html += '</tr></thead><tbody>';
@@ -431,7 +491,7 @@ function drawTable(days, busy) {
     for (const d of days) {
       const ds = toDateStr(d);
       const h = BUSINESS_HOURS[d.getDay()];
-      if (!h || ds <= today) { html += '<td class="closed-col"></td>'; continue; }
+      if (!h || ds <= today || isNotOpen(ds)) { html += '<td class="closed-col"></td>'; continue; }
       if (m < h.start * 60 || m + dur > h.end * 60) { html += '<td></td>'; continue; }
       if (!busy) { html += '<td></td>'; continue; }
       if (isAvailable(ds, t, dur, busy)) {
@@ -527,6 +587,5 @@ $('fsymptoms').addEventListener('input', e => { $('symCount').textContent = e.ta
 // ページを開いた瞬間に今週分の読み込みを開始
 loadBusy(0).catch(() => {});
 </script>
-</body>
-</html>
+
 
