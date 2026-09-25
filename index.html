@@ -312,7 +312,7 @@ const optLabel = () => selectedOpts().map(o => o.name).join('・');
 const yen = n => n.toLocaleString('ja-JP') + '円';
 let weekOffset = 0;
 let renderToken = 0;
-let openUntil = null;   // 予約受付の最終日（GASから取得。"" = 受付前）
+let openUntil = "";   // 予約受付の最終日（GASから取得。"" = 受付前）
 const busyPromise = {};  // 週の開始日 → 通信中/完了のPromise
 const busyData = {};     // 週の開始日 → 取得済みデータ
 
