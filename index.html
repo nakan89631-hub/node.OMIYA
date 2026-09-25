@@ -1,3 +1,25 @@
+何も選択されていません
+
+コンテンツへ
+Gmail でのスクリーン リーダーの使用
+Google Workspace
+Google Workspace のプレミアム機能で、ビデオ会議をより生産的に
+高画質な動画とノイズ キャンセリングで、プロフェッショナルなプレゼンテーションが可能。メモの作成や会議の録画、会話の文字起こしは Google Meet にお任せください
+スレッド
+自分
+index
+ 
+添付ファイルあり
+19:25
+自分
+node_booking_Code_v9
+ 
+添付ファイルあり
+18:46
+15 GB 中 0% 使用済み
+利用規約 · プライバシー · プログラム ポリシー
+前回のアカウント アクティビティ: 6 分前
+詳細
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -81,6 +103,7 @@
   .slot:hover { background: var(--accent-light); }
   .slot.selected { background: var(--accent); color: var(--surface2); }
   .slot-x { color: var(--text-muted); font-size: 0.85rem; }
+  .slot-dash { color: var(--text-muted); font-size: 0.9rem; }
 
   .cal-overlay { position: absolute; inset: 0; background: var(--bg); opacity: 0.92; display: none; align-items: center; justify-content: center; text-align: center; font-family: var(--sans); font-size: 0.82rem; color: var(--text-sub); letter-spacing: 0.08em; line-height: 1.9; border-radius: var(--radius-lg); z-index: 5; }
   .cal-overlay.show { display: flex; }
@@ -208,6 +231,7 @@
     <div class="cal-legend">
       <span><span class="mk">○</span>空き</span>
       <span><span class="mk x">×</span>予約済</span>
+      <span><span class="mk x">−</span>受付なし</span>
     </div>
     <p class="open-note" id="openNote"></p>
     <div class="cal-box">
@@ -240,7 +264,7 @@
       <div class="error-msg" id="err-tel">電話番号をご入力ください</div>
     </div>
     <div class="form-group">
-      <label for="fsymptoms">お悩みの症状や連絡事項<span class="optional">（任意）</span></label>
+      <label for="fsymptoms">お悩みの症状<span class="optional">（任意）</span></label>
       <textarea id="fsymptoms" maxlength="1000" placeholder="例：寝つきが悪い、肩こりがつらい、疲れが取れない など"></textarea>
       <div class="char-count"><span id="symCount">0</span> / 1000</div>
     </div>
@@ -491,8 +515,8 @@ function drawTable(days, busy) {
     for (const d of days) {
       const ds = toDateStr(d);
       const h = BUSINESS_HOURS[d.getDay()];
-      if (!h || ds <= today || isNotOpen(ds)) { html += '<td class="closed-col"></td>'; continue; }
-      if (m < h.start * 60 || m + dur > h.end * 60) { html += '<td></td>'; continue; }
+      if (!h || ds <= today || isNotOpen(ds)) { html += '<td class="closed-col"><span class="slot-dash">−</span></td>'; continue; }
+      if (m < h.start * 60 || m + dur > h.end * 60) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
       if (!busy) { html += '<td></td>'; continue; }
       if (isAvailable(ds, t, dur, busy)) {
         const sel = state.date === ds && state.time === t ? ' selected' : '';
@@ -587,5 +611,5 @@ $('fsymptoms').addEventListener('input', e => { $('symCount').textContent = e.ta
 // ページを開いた瞬間に今週分の読み込みを開始
 loadBusy(0).catch(() => {});
 </script>
-
-
+</body>
+</html>
