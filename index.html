@@ -163,8 +163,9 @@
 
 <header>
   <p class="logo">鍼灸院node.OMIYA</p>
-  <p class="sub">さいたま市大宮区大成町3-614-3</p>
-  <p class="sub">鉄道博物館駅より徒歩10分　近隣にコインパーキングあり</p>
+  <p class="sub">さいたま市大宮区大成町3－614-3</p>
+  <p class="sub">鉄道博物館駅徒歩10分・無料駐輪場完備、近隣にコインパーキングあり</p>
+  <p class="sub"> https://maps.app.goo.gl/a57y2QGxUFf191ih6</p>
 </header>
 
 <div class="container">
@@ -184,7 +185,7 @@
         <span class="duration">30分 ／ 4,500円</span>
       </button>
       <button class="course-btn" onclick="selectCourse(this, 50, '50分コース')">
-        <div><div class="name">50分コース</div><div class="detail">【おすすめ！】標準的なコース。お悩みの症状を中心に全身のバランスを整えます。</div></div>
+        <div><div class="name">50分コース</div><div class="detail">標準的なコース。お悩みの症状を中心に全身のバランスを整えます。</div></div>
         <span class="duration">50分 ／ 6,500円</span>
       </button>
       <button class="course-btn" onclick="selectCourse(this, 80, '80分コース')">
@@ -195,6 +196,18 @@
     <p class="section-title">オプション（任意・複数可）</p>
     <div class="option-grid" id="optionGrid"></div>
     <p class="option-note">※鍼追加は2倍・3倍のどちらか1つをお選びいただけます</p>
+    <p class="section-title">ご来院について</p>
+    <div class="option-grid" id="visitGrid">
+      <button class="option-btn" data-visit="新規">
+        <span class="oname">はじめて</span>
+        <span class="ometa">カウンセリング＋10分</span>
+      </button>
+      <button class="option-btn" data-visit="再来">
+        <span class="oname">2回目以降</span>
+        <span class="ometa">&nbsp;</span>
+      </button>
+    </div>
+    <p class="option-note">※はじめての方は、カウンセリングのため10分多くお時間をいただきます</p>
     <div class="option-total" id="optionTotal"></div>
     <button class="btn-primary" id="btn1" disabled onclick="goPage(2)">次へ</button>
   </div>
@@ -256,9 +269,10 @@
   <div class="page" id="page4">
     <p class="section-title">予約内容の確認</p>
     <div class="confirm-box">
+      <div class="confirm-row"><span class="label">ご来院</span><span class="val" id="c-visit"></span></div>
       <div class="confirm-row"><span class="label">コース</span><span class="val" id="c-course"></span></div>
       <div class="confirm-row"><span class="label">オプション</span><span class="val" id="c-options"></span></div>
-      <div class="confirm-row"><span class="label">施術時間</span><span class="val" id="c-duration"></span></div>
+      <div class="confirm-row"><span class="label">お時間</span><span class="val" id="c-duration"></span></div>
       <div class="confirm-row"><span class="label">料金合計</span><span class="val" id="c-price"></span></div>
       <div class="confirm-row"><span class="label">日付</span><span class="val" id="c-date"></span></div>
       <div class="confirm-row"><span class="label">時間</span><span class="val" id="c-time"></span></div>
@@ -282,7 +296,7 @@
 <script>
 // ---- 設定（GASのCONFIGと合わせる） ----
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJA5feOcc4NbOxEgrEYARUcbhqu57O0zlalv3vX20XbUcLfdoqUr74MugHewJTnZOX/exec';
-const CLINIC_TEL = '000-0000-0000';
+const CLINIC_TEL = '090-6289-5132';
 const BUSINESS_HOURS = {
   0: { start: 10, end: 17 },
   1: null,
@@ -305,9 +319,13 @@ const BED_KEYS = ['bed1', 'bed2', 'bed3'];
 // ---- 設定ここまで ----
 
 const DOW = ['日', '月', '火', '水', '木', '金', '土'];
-const state = { course: '', courseMin: 0, options: [], date: '', time: '', name: '', email: '', tel: '', symptoms: '' };
+const NEW_EXTRA_MIN = 10;
+const BUFFER_MIN = 10;   // 施術後に押さえる時間（GASのBUFFER_MINと同じ）
+const state = { course: '', courseMin: 0, options: [], visit: '', date: '', time: '', name: '', email: '', tel: '', symptoms: '' };
 const selectedOpts = () => OPTIONS.filter(o => state.options.includes(o.name));
-const totalMin = () => state.courseMin + selectedOpts().reduce((a, o) => a + o.min, 0);
+const totalMin = () => state.courseMin + selectedOpts().reduce((a, o) => a + o.min, 0)
+  + (state.visit === '新規' ? NEW_EXTRA_MIN : 0);
+const updateNextBtn = () => { $('btn1').disabled = !(state.course && state.visit); };
 const optPrice = () => selectedOpts().reduce((a, o) => a + o.price, 0);
 const coursePrice = () => COURSE_PRICES[state.course] || 0;
 const totalPrice = () => coursePrice() + optPrice();
@@ -354,7 +372,7 @@ function loadBusy(offset, force) {
 // ---- 空き判定（GASと同じルール） ----
 function isAvailable(dateStr, time, dur, busy) {
   const s = slotMs(dateStr, time);
-  const e = s + dur * 60000;
+  const e = s + (dur + BUFFER_MIN) * 60000;   // 施術＋確保時間で判定
   if (busy.owner.some(r => r[0] < e && r[1] > s)) return false;           // 個人予定と重なる
   if (BED_KEYS.some(k => busy.beds[k].some(r => r[0] === s))) return false; // 同じ開始時刻がある
   return BED_KEYS.some(k => !busy.beds[k].some(r => r[0] < e && r[1] > s)); // 空きベッドがある
@@ -368,9 +386,20 @@ function selectCourse(el, min, name) {
   state.courseMin = min;
   state.date = '';
   state.time = '';
-  $('btn1').disabled = false;
+  updateNextBtn();
   updateOptionTotal();
 }
+
+$('visitGrid').addEventListener('click', e => {
+  const btn = e.target.closest('.option-btn');
+  if (!btn) return;
+  state.visit = btn.dataset.visit;
+  state.date = '';
+  state.time = '';
+  document.querySelectorAll('#visitGrid .option-btn').forEach(b => b.classList.toggle('selected', b === btn));
+  updateNextBtn();
+  updateOptionTotal();
+});
 
 function renderOptions() {
   $('optionGrid').innerHTML = OPTIONS.map(o => `
@@ -402,7 +431,8 @@ $('optionGrid').addEventListener('click', e => {
 function updateOptionTotal() {
   const box = $('optionTotal');
   if (!state.courseMin) { box.style.display = 'none'; return; }
-  box.textContent = `施術時間 ${totalMin()}分　／　料金合計 ${yen(totalPrice())}`;
+  box.textContent = `お時間 ${totalMin()}分` + (state.visit === '新規' ? `（カウンセリング${NEW_EXTRA_MIN}分含む）` : '')
+    + `　／　料金合計 ${yen(totalPrice())}`;
   box.style.display = 'block';
 }
 
@@ -542,7 +572,8 @@ function goConfirm() {
   $('c-course').textContent = `${state.course}（${yen(coursePrice())}）`;
   $('c-price').textContent = yen(totalPrice());
   $('c-options').textContent = state.options.length ? `${optLabel()}（${yen(optPrice())}）` : 'なし';
-  $('c-duration').textContent = `${totalMin()}分`;
+  $('c-duration').textContent = `${totalMin()}分` + (state.visit === '新規' ? `（カウンセリング${NEW_EXTRA_MIN}分含む）` : '');
+  $('c-visit').textContent = state.visit === '新規' ? 'はじめて' : '2回目以降';
   $('c-date').textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）`;
   $('c-time').textContent = `${state.time}〜`;
   $('c-name').textContent = name;
@@ -560,7 +591,7 @@ async function submitBooking() {
     const res = await fetch(GAS_URL, {
       method: 'POST',
       body: new URLSearchParams({
-        name: state.name, email: state.email, tel: state.tel, symptoms: state.symptoms,
+        name: state.name, email: state.email, tel: state.tel, symptoms: state.symptoms, visit: state.visit,
         course: state.course, options: state.options.join(','), date: state.date, time: state.time,
       }),
     });
