@@ -163,9 +163,8 @@
 
 <header>
   <p class="logo">鍼灸院node.OMIYA</p>
-  <p class="sub">さいたま市大宮区大成町3－614-3</p>
-  <p class="sub">鉄道博物館駅徒歩10分・無料駐輪場完備、近隣にコインパーキングあり</p>
-  <p class="sub"> https://maps.app.goo.gl/a57y2QGxUFf191ih6</p>
+  <p class="sub">さいたま市大宮区大成町3-614-3</p>
+  <p class="sub">鉄道博物館駅徒歩10分　近隣にコインパーキングあり</p>
 </header>
 
 <div class="container">
@@ -298,14 +297,15 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyJA5feOcc4NbOxEgrEYARUcbhqu57O0zlalv3vX20XbUcLfdoqUr74MugHewJTnZOX/exec';
 const CLINIC_TEL = '090-6289-5132';
 const BUSINESS_HOURS = {
-  0: { start: 10, end: 17 },
-  1: null,
-  2: null,
-  3: { start: 10, end: 15.5 },
-  4: { start: 10, end: 17 },
-  5: { start: 10, end: 17 },
-  6: null,
+  0: { start: 9, end: 17.5 },
+  1: { start: 9, end: 17.5 },
+  2: { start: 9, end: 17.5 },
+  3: { start: 9, end: 17.5 },
+  4: { start: 9, end: 17.5 },
+  5: { start: 9, end: 17.5 },
+  6: { start: 9, end: 17.5 },
 };
+const LEAD_HOURS = 2;   // 当日予約は開始の何時間前まで（GASのBOOKING_LEAD_HOURSと同じ）
 const SLOT_MIN = 15;
 const COURSE_PRICES = { '30分コース': 4500, '50分コース': 6500, '80分コース': 9000 };
 // オプション（group が同じものはどちらか1つだけ）
@@ -513,7 +513,7 @@ function drawTable(days, busy) {
   let html = '<thead><tr><th></th>';
   for (const d of days) {
     const ds = toDateStr(d);
-    const closed = !BUSINESS_HOURS[d.getDay()] || ds <= today || isNotOpen(ds);
+    const closed = !BUSINESS_HOURS[d.getDay()] || ds < today || isNotOpen(ds);
     html += `<th class="${closed ? 'closed' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="date-num">${d.getDate()}</span></th>`;
   }
   html += '</tr></thead><tbody>';
@@ -524,8 +524,9 @@ function drawTable(days, busy) {
     for (const d of days) {
       const ds = toDateStr(d);
       const h = BUSINESS_HOURS[d.getDay()];
-      if (!h || ds <= today || isNotOpen(ds)) { html += '<td class="closed-col"><span class="slot-dash">−</span></td>'; continue; }
+      if (!h || ds < today || isNotOpen(ds)) { html += '<td class="closed-col"><span class="slot-dash">−</span></td>'; continue; }
       if (m < h.start * 60 || m + dur > h.end * 60) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
+      if (slotMs(ds, t) < Date.now() + LEAD_HOURS * 3600000) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
       if (!busy) { html += '<td></td>'; continue; }
       if (isAvailable(ds, t, dur, busy)) {
         const sel = state.date === ds && state.time === t ? ' selected' : '';
