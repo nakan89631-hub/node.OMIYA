@@ -4,293 +4,248 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ご予約 | 鍼灸院node.OMIYA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
+  /* 1枚のカードに全項目を縦に並べ、最後に1回だけ確定するフォーム */
   :root {
-    --bg: #F7F3EC; --surface: #FDFAF5; --surface2: #FFFFFF;
-    --text: #2A2118; --text-sub: #5C4C38; --text-muted: #8C7C68;
-    --accent: #6B5A3E; --accent-light: #E8DFD0;
-    --border: #D2C7B4; --border-strong: #B3A48C;
-    --radius: 4px; --radius-lg: 8px;
-    --sans: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    --page: #F3EFE8; --card: #FFFFFF; --field: #FFFFFF; --soft: #F7F4EF; --note-bg: #FCF8F3;
+    --text: #2A2118; --text-sub: #5C4C38; --text-muted: #9A8B78;
+    --accent: #8A6E4F; --accent-ink: #FFFFFF; --accent-soft: #EFE7DC;
+    --line: #E3DBCF; --line-strong: #CDBFAC; --note-line: #E2CDB8; --danger: #A04040;
+    --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', serif;
+    --sans: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', sans-serif;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1C1810; --surface: #252015; --surface2: #2E2818;
-      --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
-      --accent: #C4A97A; --accent-light: #3A3020;
-      --border: #4A3F2C; --border-strong: #6E6048;
-    }
-  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --page: #17140F; --card: #221D16; --field: #2A241C; --soft: #2A241C; --note-bg: #2A2219;
+    --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
+    --accent: #C4A27A; --accent-ink: #1C1810; --accent-soft: #3A3020;
+    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --page: #17140F; --card: #221D16; --field: #2A241C; --soft: #2A241C; --note-bg: #2A2219;
+    --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
+    --accent: #C4A27A; --accent-ink: #1C1810; --accent-soft: #3A3020;
+    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; color-scheme: dark; }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
-    background: var(--bg); color: var(--text); min-height: 100vh;
-    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
-  }
-  header { text-align: center; padding: 2.5rem 1.5rem 1.5rem; border-bottom: 0.5px solid var(--border); background: var(--surface); }
-  header .logo { font-size: 1.35rem; letter-spacing: 0.25em; color: var(--accent); }
-  header .sub { font-size: 0.72rem; letter-spacing: 0.2em; color: var(--text-sub); margin-top: 0.3rem; font-family: var(--sans); }
-  .container { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+  body { background: var(--page); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.7;
+    padding-block: 1.5rem 3rem; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+  .card { max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 2.25rem 1.6rem 2rem; }
 
-  .steps { display: flex; margin-bottom: 2rem; border-bottom: 0.5px solid var(--border); padding-bottom: 1rem; }
-  .step { flex: 1; text-align: center; font-size: 0.7rem; font-family: var(--sans); color: var(--text-muted); position: relative; padding-bottom: 0.75rem; }
-  .step.active { color: var(--accent); }
-  .step.active::after { content: ''; position: absolute; bottom: -1rem; left: 0; right: 0; height: 1px; background: var(--accent); }
-  .step .num { display: block; font-size: 1rem; margin-bottom: 0.2rem; }
+  header { text-align: center; margin-bottom: 2.25rem; }
+  .eyebrow { font-family: var(--sans); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.32em; color: var(--accent); }
+  h1 { font-family: var(--serif); font-size: 1.85rem; font-weight: 600; letter-spacing: 0.12em; margin: 0.35rem 0 0.4rem; text-wrap: balance; }
+  .tagline { font-size: 0.92rem; color: var(--text-sub); letter-spacing: 0.08em; }
 
-  .section-title { font-size: 0.72rem; letter-spacing: 0.15em; color: var(--text-sub); font-family: var(--sans); margin-bottom: 0.75rem; }
+  .field { margin-bottom: 2rem; }
+  .label { display: flex; align-items: center; gap: 0.55rem; font-family: var(--serif); font-size: 1.12rem; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+  .label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .label .opt { font-family: var(--sans); font-size: 0.85rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0; }
+  .hint { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; }
 
-  .course-grid { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
-  .course-btn { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; color: var(--text); font-family: inherit; }
-  .course-btn:hover { border-color: var(--border-strong); background: var(--surface2); }
-  .course-btn.selected { border-color: var(--accent); background: var(--surface2); box-shadow: inset 0 0 0 0.5px var(--accent); }
-  .course-btn .name { font-size: 0.95rem; letter-spacing: 0.05em; }
-  .course-btn .detail { font-size: 0.72rem; color: var(--text-sub); font-family: var(--sans); margin-top: 0.2rem; }
-  .course-btn .duration { font-size: 0.8rem; color: var(--text-sub); font-family: var(--sans); white-space: nowrap; }
+  .choice { display: block; width: 100%; text-align: left; font: inherit; font-size: 1rem; color: var(--text); background: var(--field); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; cursor: pointer; margin-bottom: 0.7rem; line-height: 1.6; }
+  .choice:last-child { margin-bottom: 0; }
+  .choice .sub { display: block; font-size: 0.85rem; color: var(--text-sub); font-weight: 400; }
+  .choice.on { background: var(--soft); border: 1.5px solid var(--accent); font-weight: 700; }
 
-  .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .option-btn { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 0.75rem 0.8rem; cursor: pointer; text-align: left; color: var(--text); font-family: var(--sans); }
-  .option-btn .oname { display: block; font-size: 0.82rem; }
-  .option-btn .ometa { display: block; font-size: 0.68rem; color: var(--text-sub); margin-top: 0.2rem; }
-  .option-btn.selected { border-color: var(--accent); background: var(--surface2); box-shadow: inset 0 0 0 0.5px var(--accent); }
-  .option-btn.selected .oname::before { content: '✓ '; color: var(--accent); }
-  .option-note { font-size: 0.68rem; font-family: var(--sans); color: var(--text-muted); margin-bottom: 1rem; }
-  .option-total { background: var(--accent-light); border-radius: var(--radius-lg); padding: 0.7rem 1rem; font-size: 0.8rem; font-family: var(--sans); color: var(--accent); text-align: center; margin-bottom: 1.5rem; display: none; }
+  .select-wrap { position: relative; }
+  .select-wrap::after { content: ''; position: absolute; right: 1.2rem; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--text-sub); border-bottom: 2px solid var(--text-sub); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+  select, input[type="text"], input[type="email"], input[type="tel"], textarea {
+    width: 100%; font: inherit; font-size: 1.05rem; color: var(--text); background: var(--field);
+    border: 1px solid var(--line); border-radius: 12px; padding: 0.95rem 1.1rem; outline: none; -webkit-appearance: none; appearance: none; }
+  select { padding-right: 2.6rem; }
+  textarea { min-height: 130px; resize: vertical; line-height: 1.7; }
+  select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+  ::placeholder { color: var(--text-muted); }
 
-  .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-  .week-nav button { background: none; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.75rem; font-size: 0.8rem; font-family: var(--sans); color: var(--text-sub); cursor: pointer; }
+  .opt-list { background: var(--soft); border: 1px solid var(--line); border-radius: 14px; padding: 0.4rem 1.1rem; }
+  .opt-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0; cursor: pointer; }
+  .opt-row + .opt-row { border-top: 1px dashed var(--line); }
+  .opt-row input { width: 22px; height: 22px; accent-color: var(--accent); flex-shrink: 0; }
+  .opt-row .nm { flex: 1; min-width: 0; }
+  .opt-row .nm small { display: block; font-size: 0.8rem; color: var(--text-muted); }
+  .opt-row .pr { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* 空き枠カレンダー */
+  .cal-placeholder { color: var(--text-muted); text-align: center; padding: 1.6rem 1rem; border: 1px dashed var(--line-strong); border-radius: 12px; font-size: 0.95rem; }
+  .week-nav { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .week-nav button { font: inherit; font-size: 0.9rem; color: var(--text-sub); background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 0.4rem 0.75rem; cursor: pointer; }
   .week-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
-  .week-label { font-size: 0.8rem; font-family: var(--sans); color: var(--text-sub); }
-
-  .cal-legend { display: flex; gap: 1.25rem; margin-bottom: 0.75rem; font-size: 0.72rem; font-family: var(--sans); color: var(--text-sub); }
-  .cal-legend .mk { color: var(--accent); margin-right: 0.3rem; }
-  .cal-legend .mk.x { color: var(--text-muted); }
-
-  .open-note { font-size: 0.88rem; font-family: var(--sans); color: var(--text-sub); margin-bottom: 0.75rem; }
-  .cal-box { position: relative; min-height: 220px; margin-bottom: 1.5rem; }
-  .cal-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .cal-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 0.75rem; }
-  .cal-table th { padding: 0.4rem 0.2rem; text-align: center; font-weight: 400; color: var(--text-sub); border-bottom: 0.5px solid var(--border); white-space: nowrap; }
-  .cal-table th.closed { color: var(--text-muted); }
-  .cal-table th .dow { display: block; font-size: 0.65rem; }
-  .cal-table th .date-num { display: block; font-size: 0.85rem; margin-top: 0.1rem; }
-  .cal-table td { padding: 0; text-align: center; height: 32px; }
-  .cal-table td.time-col { color: var(--text-muted); font-size: 0.68rem; padding-right: 0.4rem; white-space: nowrap; text-align: right; border-right: 0.5px solid var(--border); }
-  .cal-table td.closed-col { background: var(--bg); opacity: 0.5; }
-  .slot { width: 100%; height: 32px; border: none; background: transparent; color: var(--accent); font-size: 1.05rem; cursor: pointer; font-family: var(--sans); }
-  .slot:hover { background: var(--accent-light); }
-  .slot.selected { background: var(--accent); color: var(--surface2); }
-  .slot-x { color: var(--text-muted); font-size: 0.85rem; }
-  .slot-dash { color: var(--text-muted); font-size: 0.9rem; }
-
-  .cal-overlay { position: absolute; inset: 0; background: var(--bg); opacity: 0.92; display: none; align-items: center; justify-content: center; text-align: center; font-family: var(--sans); font-size: 0.82rem; color: var(--text-sub); letter-spacing: 0.08em; line-height: 1.9; border-radius: var(--radius-lg); z-index: 5; }
+  .week-label { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 0.4rem; flex-wrap: wrap; }
+  .legend .mk { color: var(--accent); font-weight: 700; margin-right: 0.25rem; }
+  .legend .mk.x { color: var(--text-muted); }
+  .open-note { font-size: 0.88rem; color: var(--text-sub); margin-bottom: 0.5rem; }
+  .cal-box { position: relative; min-height: 200px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .cal-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 420px; overflow-y: auto; }
+  .cal-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+  .cal-table th { position: sticky; top: 0; background: var(--soft); padding: 0.4rem 0.15rem; font-weight: 400; color: var(--text-sub); border-bottom: 1px solid var(--line); white-space: nowrap; z-index: 1; }
+  .cal-table th .dow { display: block; font-size: 0.75rem; }
+  .cal-table th .num { display: block; font-size: 1rem; font-weight: 700; color: var(--text); }
+  .cal-table th.closed .num { color: var(--text-muted); }
+  .cal-table td { text-align: center; height: 40px; padding: 0; }
+  .cal-table td.time { color: var(--text-sub); font-weight: 600; padding: 0 0.5rem; text-align: right; border-right: 1px solid var(--line); white-space: nowrap; }
+  .cal-table td.closed { background: var(--soft); }
+  .slot { width: 100%; height: 40px; border: none; background: transparent; color: var(--accent); font-size: 1.25rem; font-weight: 700; cursor: pointer; font-family: var(--sans); }
+  .slot:hover { background: var(--accent-soft); }
+  .slot.on { background: var(--accent); color: var(--accent-ink); }
+  .slot-x, .slot-dash { color: var(--text-muted); }
+  .cal-overlay { position: absolute; inset: 0; background: var(--card); opacity: 0.94; display: none; align-items: center; justify-content: center; text-align: center; color: var(--text-sub); font-weight: 600; line-height: 1.9; z-index: 2; }
   .cal-overlay.show { display: flex; }
-  .cal-overlay button { margin-top: 0.75rem; padding: 0.5rem 1.25rem; border: 0.5px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--text-sub); font-family: var(--sans); cursor: pointer; }
+  .cal-overlay button { margin-top: 0.6rem; font: inherit; font-size: 0.9rem; padding: 0.45rem 1.1rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--field); color: var(--text-sub); cursor: pointer; }
+  .picked { display: none; margin-top: 0.8rem; background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 12px; padding: 0.8rem 1rem; text-align: center; }
+  .picked.show { display: block; }
 
-  .slot-info { background: var(--accent-light); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; font-family: var(--sans); color: var(--accent); text-align: center; }
+  .err { display: none; color: var(--danger); font-size: 0.85rem; font-weight: 600; margin-top: 0.4rem; }
+  .err.show { display: block; }
+  .count { font-size: 0.78rem; color: var(--text-muted); text-align: right; margin-top: 0.3rem; }
 
-  .form-group { margin-bottom: 1rem; }
-  label { display: block; font-size: 0.72rem; font-family: var(--sans); color: var(--text-sub); letter-spacing: 0.1em; margin-bottom: 0.4rem; }
-  input[type="text"], input[type="email"], input[type="tel"] { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; font-family: var(--sans); border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); outline: none; }
-  textarea { width: 100%; min-height: 110px; padding: 0.75rem 1rem; font-size: 1rem; font-family: var(--sans); line-height: 1.6; border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); color: var(--text); outline: none; resize: vertical; }
-  input:focus, textarea:focus { border-color: var(--accent); }
-  .optional { color: var(--text-muted); margin-left: 0.3rem; }
-  .char-count { font-size: 0.68rem; font-family: var(--sans); color: var(--text-muted); text-align: right; margin-top: 0.3rem; }
-  .error-msg { font-size: 0.72rem; font-family: var(--sans); color: #A04040; margin-top: 0.4rem; display: none; }
-  .error-msg.show { display: block; }
+  /* 料金 */
+  .price-box { background: var(--soft); border: 1px solid var(--note-line); border-radius: 14px; padding: 1.1rem 1.3rem; margin-bottom: 1.5rem; }
+  .price-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; color: var(--text-sub); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+  .price-row + .price-row { margin-top: 0.35rem; }
+  .price-row.total { border-top: 1px dashed var(--line-strong); margin-top: 0.8rem; padding-top: 0.8rem; color: var(--text); font-family: var(--serif); font-size: 1.15rem; font-weight: 600; }
+  .price-row.total .v { font-size: 1.9rem; color: var(--accent); }
+  .price-time { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem; text-align: right; }
 
-  .confirm-box { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 2rem; }
-  .confirm-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.45rem 0; border-bottom: 0.5px solid var(--border); }
-  .confirm-row:last-child { border-bottom: none; }
-  .confirm-row .label { font-size: 0.72rem; font-family: var(--sans); color: var(--text-sub); white-space: nowrap; }
-  .confirm-row .val { font-size: 0.9rem; text-align: right; word-break: break-all; }
+  /* 重要確認事項 */
+  .notice { background: var(--note-bg); border: 1.5px solid var(--note-line); border-radius: 14px; padding: 1.2rem 1.3rem 1.3rem; margin-bottom: 1.5rem; }
+  .notice h2 { font-family: var(--serif); font-size: 1.08rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 0.7rem; }
+  .notice ul { padding-left: 1.2rem; display: grid; gap: 0.6rem; font-size: 0.95rem; }
+  .notice li b { font-weight: 700; }
+  .agree { display: flex; align-items: center; gap: 0.75rem; background: var(--field); border: 1px solid var(--line); border-radius: 12px; padding: 0.95rem 1.1rem; margin-top: 1rem; cursor: pointer; font-weight: 700; }
+  .agree input { width: 24px; height: 24px; accent-color: var(--accent); flex-shrink: 0; }
 
-  .btn-primary { width: 100%; padding: 1rem; font-size: 0.9rem; font-family: var(--sans); letter-spacing: 0.15em; background: var(--accent); color: #FDFAF5; border: none; border-radius: var(--radius-lg); cursor: pointer; }
-  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
-  .btn-secondary { width: 100%; padding: 0.85rem; font-size: 0.88rem; font-family: var(--sans); background: transparent; color: var(--text-sub); border: 0.5px solid var(--border); border-radius: var(--radius-lg); cursor: pointer; margin-top: 0.75rem; }
+  .submit { width: 100%; font-family: var(--serif); font-size: 1.2rem; font-weight: 600; letter-spacing: 0.2em; color: var(--accent-ink); background: var(--accent); border: none; border-radius: 14px; padding: 1.15rem; cursor: pointer; }
+  .submit:disabled { background: var(--line-strong); color: var(--card); cursor: not-allowed; }
+  .submit-msg { display: none; color: var(--danger); font-weight: 700; font-size: 0.92rem; text-align: center; margin-bottom: 0.8rem; white-space: pre-line; }
+  .submit-msg.show { display: block; }
 
-  .done-screen { text-align: center; padding: 3rem 1.5rem; display: none; }
-  .done-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem; color: var(--accent); }
-  .done-title { font-size: 1.1rem; letter-spacing: 0.1em; margin-bottom: 0.75rem; color: var(--accent); }
-  .done-sub { font-size: 0.82rem; font-family: var(--sans); color: var(--text-sub); line-height: 1.8; }
+  .done { display: none; text-align: center; padding: 1rem 0 0.5rem; }
+  .done .mark { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; }
+  .done h2 { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.8rem; }
+  .done .detail { font-weight: 700; white-space: pre-line; margin-bottom: 1rem; }
+  .done p { color: var(--text-sub); }
 
-  .page { display: none; }
-  .page.active { display: block; }
-
-  /* ===== 読みやすさ調整 ===== */
-  body { line-height: 1.6; }
-  .container { max-width: 600px; }
-  header .logo { font-size: 1.65rem; }
-  header .sub { font-size: 0.88rem; }
-  .step { font-size: 0.85rem; font-weight: 600; }
-  .step .num { font-size: 1.2rem; }
-  .section-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; color: var(--text); margin-bottom: 0.9rem; }
-  .course-btn, .option-btn { border-width: 1px; }
-  .course-btn .name { font-size: 1.15rem; font-weight: 600; }
-  .course-btn .detail { font-size: 0.88rem; }
-  .course-btn .duration { font-size: 0.95rem; font-weight: 600; color: var(--accent); }
-  .option-btn .oname { font-size: 0.98rem; font-weight: 600; }
-  .option-btn .ometa { font-size: 0.82rem; }
-  .option-note { font-size: 0.82rem; }
-  .option-total { font-size: 0.98rem; font-weight: 600; }
-  .week-nav button { font-size: 0.92rem; border-width: 1px; }
-  .week-label { font-size: 1rem; font-weight: 600; color: var(--text); }
-  .cal-legend { font-size: 0.9rem; }
-  .cal-table th .dow { font-size: 0.82rem; }
-  .cal-table th .date-num { font-size: 1.05rem; font-weight: 600; color: var(--text); }
-  .cal-table th.closed .date-num { color: var(--text-muted); }
-  .cal-table td { height: 40px; }
-  .cal-table td.time-col { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
-  .slot { height: 40px; font-size: 1.3rem; font-weight: 700; }
-  .slot-x { font-size: 1.05rem; }
-  .cal-overlay { font-size: 1rem; font-weight: 600; }
-  .slot-info { font-size: 1rem; font-weight: 600; line-height: 1.7; }
-  label { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-  input[type="text"], input[type="email"], input[type="tel"], textarea { font-size: 1.05rem; border-width: 1px; }
-  .error-msg { font-size: 0.85rem; font-weight: 600; }
-  .char-count { font-size: 0.8rem; }
-  .confirm-row { padding: 0.65rem 0; }
-  .confirm-row .label { font-size: 0.88rem; font-weight: 600; }
-  .confirm-row .val { font-size: 1.02rem; }
-  .btn-primary { font-size: 1.05rem; font-weight: 600; padding: 1.1rem; }
-  .btn-secondary { font-size: 0.98rem; border-width: 1px; }
-  .done-title { font-size: 1.35rem; }
-  .done-sub { font-size: 0.98rem; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 420px) { .card { padding: 1.8rem 1.1rem 1.6rem; border-radius: 18px; } h1 { font-size: 1.55rem; } }
 </style>
 </head>
 <body>
+<main class="card">
+  <header>
+    <p class="eyebrow">NODE. OMIYA</p>
+    <h1>鍼灸院node.OMIYA</h1>
+    <p class="tagline">さいたま市大宮区大成町3丁目614－3　鉄道博物館駅10分</p>
+  </header>
 
-<header>
-  <p class="logo">鍼灸院node.OMIYA</p>
-  <p class="sub">※2026年10月より新店舗に移転しております。</p>
-  <p class="sub">さいたま市大宮区大成町3－614-3</p>
-  <p class="sub">鉄道博物館駅徒歩10分　近隣にコインパーキングあり</p>
-</header>
-
-<div class="container">
-  <div class="steps" id="stepsBar">
-    <div class="step active" id="s1"><span class="num">1</span>コース</div>
-    <div class="step" id="s2"><span class="num">2</span>日時</div>
-    <div class="step" id="s3"><span class="num">3</span>お客様情報</div>
-    <div class="step" id="s4"><span class="num">4</span>確認</div>
-  </div>
-
-  <!-- 1: コース -->
-  <div class="page active" id="page1">
-    <p class="section-title">コースをお選びください</p>
-    <div class="course-grid">
-      <button class="course-btn" onclick="selectCourse(this, 30, '30分コース')">
-        <div><div class="name">30分コース</div><div class="detail">お急ぎの方向け。気になる部位に絞って施術します。</div></div>
-        <span class="duration">30分 ／ 4,500円</span>
-      </button>
-      <button class="course-btn" onclick="selectCourse(this, 50, '50分コース')">
-        <div><div class="name">50分コース</div><div class="detail">標準的なコース。お悩みの症状を中心に全身のバランスを整えます。</div></div>
-        <span class="duration">50分 ／ 6,500円</span>
-      </button>
-      <button class="course-btn" onclick="selectCourse(this, 80, '80分コース')">
-        <div><div class="name">80分コース</div><div class="detail">しっかり全身コース。複数のお悩みがある方、慢性的な不調、疲労や緊張が強い方向け。</div></div>
-        <span class="duration">80分 ／ 9,000円</span>
-      </button>
-    </div>
-    <p class="section-title">オプション（任意・複数可）</p>
-    <div class="option-grid" id="optionGrid"></div>
-    <p class="option-note">※鍼追加は2倍・3倍のどちらか1つをお選びいただけます</p>
-    <p class="section-title">ご来院について</p>
-    <div class="option-grid" id="visitGrid">
-      <button class="option-btn" data-visit="新規">
-        <span class="oname">はじめて</span>
-        <span class="ometa">カウンセリング＋10分</span>
-      </button>
-      <button class="option-btn" data-visit="再来">
-        <span class="oname">2回目以降</span>
-        <span class="ometa">&nbsp;</span>
-      </button>
-    </div>
-    <p class="option-note">※はじめての方は、カウンセリングのため10分多くお時間をいただきます</p>
-    <div class="option-total" id="optionTotal"></div>
-    <button class="btn-primary" id="btn1" disabled onclick="goPage(2)">次へ</button>
-  </div>
-
-  <!-- 2: 日時 -->
-  <div class="page" id="page2">
-    <p class="section-title">ご希望の日時をお選びください</p>
-    <div class="week-nav">
-      <button id="btnPrevWeek" onclick="changeWeek(-1)" disabled>◀ 前の週</button>
-      <span class="week-label" id="weekLabel"></span>
-      <button id="btnNextWeek" onclick="changeWeek(1)">次の週 ▶</button>
-    </div>
-    <div class="cal-legend">
-      <span><span class="mk">○</span>空き</span>
-      <span><span class="mk x">×</span>予約済</span>
-      <span><span class="mk x">−</span>受付なし</span>
-    </div>
-    <p class="open-note" id="openNote"></p>
-    <div class="cal-box">
-      <div class="cal-overlay" id="calLoading">空き状況を確認中です<br>少々お待ちください…</div>
-      <div class="cal-overlay" id="calError">
-        <div>空き状況を読み込めませんでした<br><button onclick="renderWeek(true)">もう一度読み込む</button></div>
+  <div id="form">
+    <!-- 患者様区分 -->
+    <div class="field" id="fVisit">
+      <p class="label">患者様区分</p>
+      <div id="visitGrid">
+        <button class="choice" data-visit="新規">初めてのご来院（新規）<span class="sub">カウンセリングのため、お時間が10分長くなります</span></button>
+        <button class="choice" data-visit="再来">2回目以降</button>
       </div>
-      <div class="cal-wrap"><table class="cal-table" id="calTable"></table></div>
     </div>
-    <button class="btn-secondary" onclick="goPage(1)">戻る</button>
-  </div>
 
-  <!-- 3: お客様情報 -->
-  <div class="page" id="page3">
-    <div class="slot-info" id="page3SlotInfo"></div>
-    <p class="section-title">お客様情報</p>
-    <div class="form-group">
-      <label for="fname">お名前</label>
+    <!-- 予約メニュー -->
+    <div class="field" id="fCourse">
+      <label class="label" for="course">予約メニュー</label>
+      <div class="select-wrap">
+        <select id="course">
+          <option value="">選択してください</option>
+          <option value="30分コース">30分コース（4,500円）体験・軽めのケアに</option>
+          <option value="50分コース">50分コース（6,500円）標準・全身の調整に</option>
+          <option value="80分コース">80分コース（9,000円）じっくり・慢性症状・自律神経ケアに</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 追加オプション -->
+    <div class="field">
+      <p class="label">追加オプション <span class="opt">（任意）</span></p>
+      <div class="opt-list" id="optionList"></div>
+      <p class="hint">※鍼追加は2倍・3倍のどちらか1つをお選びいただけます</p>
+    </div>
+
+    <!-- ご希望日時 -->
+    <div class="field" id="fDate">
+      <p class="label">ご希望日時</p>
+      <p class="cal-placeholder" id="calPlaceholder">患者様区分と予約メニューを選ぶと、<br>空いている日時が表示されます</p>
+      <div id="calArea" hidden>
+        <div class="week-nav">
+          <button id="btnPrevWeek" onclick="changeWeek(-1)" disabled>◀ 前の週</button>
+          <span class="week-label" id="weekLabel"></span>
+          <button id="btnNextWeek" onclick="changeWeek(1)">次の週 ▶</button>
+        </div>
+        <div class="legend">
+          <span><span class="mk">○</span>空き</span>
+          <span><span class="mk x">×</span>予約済</span>
+          <span><span class="mk x">−</span>受付なし</span>
+        </div>
+        <p class="open-note" id="openNote"></p>
+        <div class="cal-box">
+          <div class="cal-overlay" id="calLoading">空き状況を確認中です<br>少々お待ちください…</div>
+          <div class="cal-overlay" id="calError"><div>空き状況を読み込めませんでした<br><button onclick="renderWeek(true)">もう一度読み込む</button></div></div>
+          <div class="cal-wrap"><table class="cal-table" id="calTable"></table></div>
+        </div>
+      </div>
+      <p class="picked" id="picked"></p>
+    </div>
+
+    <!-- お客様情報 -->
+    <div class="field" id="fInfo">
+      <label class="label" for="fname">お名前</label>
       <input type="text" id="fname" placeholder="山田 花子" autocomplete="name">
-      <div class="error-msg" id="err-name">お名前をご入力ください</div>
+      <p class="err" id="err-name">お名前をご入力ください</p>
     </div>
-    <div class="form-group">
-      <label for="femail">メールアドレス</label>
-      <input type="email" id="femail" placeholder="example@mail.com" autocomplete="email">
-      <div class="error-msg" id="err-email">正しいメールアドレスをご入力ください</div>
+    <div class="field">
+      <label class="label" for="ftel">お電話番号</label>
+      <input type="tel" id="ftel" placeholder="09012345678" autocomplete="tel" inputmode="tel">
+      <p class="err" id="err-tel">お電話番号をご入力ください</p>
     </div>
-    <div class="form-group">
-      <label for="ftel">電話番号</label>
-      <input type="tel" id="ftel" placeholder="090-0000-0000" autocomplete="tel">
-      <div class="error-msg" id="err-tel">電話番号をご入力ください</div>
+    <div class="field">
+      <label class="label" for="femail">メールアドレス</label>
+      <input type="email" id="femail" placeholder="example@email.com" autocomplete="email" inputmode="email">
+      <p class="err" id="err-email">正しいメールアドレスをご入力ください</p>
     </div>
-    <div class="form-group">
-      <label for="fsymptoms">お悩みの症状<span class="optional">（任意）</span></label>
-      <textarea id="fsymptoms" maxlength="1000" placeholder="例：寝つきが悪い、肩こりがつらい、疲れが取れない など"></textarea>
-      <div class="char-count"><span id="symCount">0</span> / 1000</div>
+    <div class="field">
+      <label class="label" for="fsymptoms">お悩みの症状・ご質問 <span class="opt">（任意）</span></label>
+      <textarea id="fsymptoms" maxlength="1000" placeholder="気になる症状やご質問などがございましたら、ご自由にご記入ください（1000文字まで）"></textarea>
+      <p class="count"><span id="symCount">0</span> / 1000</p>
     </div>
-    <br>
-    <button class="btn-primary" onclick="goConfirm()">内容を確認する</button>
-    <button class="btn-secondary" onclick="goPage(2)">戻る</button>
-  </div>
 
-  <!-- 4: 確認 -->
-  <div class="page" id="page4">
-    <p class="section-title">予約内容の確認</p>
-    <div class="confirm-box">
-      <div class="confirm-row"><span class="label">ご来院</span><span class="val" id="c-visit"></span></div>
-      <div class="confirm-row"><span class="label">コース</span><span class="val" id="c-course"></span></div>
-      <div class="confirm-row"><span class="label">オプション</span><span class="val" id="c-options"></span></div>
-      <div class="confirm-row"><span class="label">お時間</span><span class="val" id="c-duration"></span></div>
-      <div class="confirm-row"><span class="label">料金合計</span><span class="val" id="c-price"></span></div>
-      <div class="confirm-row"><span class="label">日付</span><span class="val" id="c-date"></span></div>
-      <div class="confirm-row"><span class="label">時間</span><span class="val" id="c-time"></span></div>
-      <div class="confirm-row"><span class="label">お名前</span><span class="val" id="c-name"></span></div>
-      <div class="confirm-row"><span class="label">メール</span><span class="val" id="c-email"></span></div>
-      <div class="confirm-row"><span class="label">電話</span><span class="val" id="c-tel"></span></div>
-      <div class="confirm-row"><span class="label">お悩みの症状</span><span class="val" id="c-symptoms" style="white-space:pre-wrap;text-align:left;"></span></div>
+    <!-- 料金 -->
+    <div class="price-box">
+      <div class="price-row"><span>施術料金</span><span id="pCourse">0円</span></div>
+      <div class="price-row"><span>オプション</span><span id="pOption">0円</span></div>
+      <div class="price-row total"><span>合計金額</span><span class="v" id="pTotal">0円</span></div>
+      <p class="price-time" id="pTime"></p>
     </div>
-    <button class="btn-primary" id="btnSubmit" onclick="submitBooking()">予約を確定する</button>
-    <button class="btn-secondary" onclick="goPage(3)">戻る</button>
+
+    <!-- 重要確認事項 -->
+    <div class="notice">
+      <h2>【ご予約前の確認事項】</h2>
+      <ul>
+        <li>当院は少人数で営んでいるため、<b>お待たせしてしまうことがございます</b>。<b>施術後のご予定には、時間に余裕をもたせて</b>いただけますと幸いです。</li>
+        <li><b>キャンセル・変更は前日まで</b>、確認メールのリンクから承ります。<b>当日のキャンセル</b>は、<b>お電話またはショートメッセージ</b>（090-6289-5132）にてご連絡ください。施術中はお電話に出られないことがございますので、ショートメッセージもご利用ください。</li>
+        <li>鍼の反応や内出血のリスクがあるため、<b>海外旅行や大事なご予定の前（結婚式など）</b>の前日は施術をお控えください。</li>
+      </ul>
+      <label class="agree"><input type="checkbox" id="agree"> 上記の確認事項に同意しました</label>
+    </div>
+
+    <p class="submit-msg" id="submitMsg"></p>
+    <button class="submit" id="btnSubmit" disabled onclick="submitBooking()">ご予約を確定する</button>
   </div>
 
   <!-- 完了 -->
-  <div class="done-screen" id="doneScreen">
-    <div class="done-icon">✦</div>
-    <p class="done-title">ご予約を承りました</p>
-    <p class="done-sub">確認メールをお送りしました。<br>ご来院をお待ちしております。<br><br>鍼灸院node.OMIYA</p>
+  <div class="done" id="done">
+    <div class="mark">✦</div>
+    <h2>ご予約を承りました</h2>
+    <p class="detail" id="doneDetail"></p>
+    <p>確認メールをお送りしました。<br>ご来院をお待ちしております。</p>
   </div>
-</div>
+</main>
 
 <script>
 // ---- 設定（GASのCONFIGと合わせる） ----
@@ -307,48 +262,44 @@ const BUSINESS_HOURS = {
 };
 const LEAD_HOURS = 2;   // 当日予約は開始の何時間前まで（GASのBOOKING_LEAD_HOURSと同じ）
 const SLOT_MIN = 15;
-const COURSE_PRICES = { '30分コース': 4500, '50分コース': 6500, '80分コース': 9000 };
+const COURSES = { '30分コース': { min: 30, price: 4500 }, '50分コース': { min: 50, price: 6500 }, '80分コース': { min: 80, price: 9000 } };
 // オプション（group が同じものはどちらか1つだけ）
 const OPTIONS = [
-  { name: '鍼追加2倍',        min: 10, price: 500,  group: 'hari' },
-  { name: '鍼追加3倍',        min: 10, price: 1000, group: 'hari' },
-  { name: '美容鍼',           min: 15, price: 2000 },
-  { name: 'ドライヘッドスパ', min: 10, price: 1000 },
+  { name: '鍼追加2倍',          min: 10, price: 500,  group: 'hari' },
+  { name: '鍼追加3倍',          min: 10, price: 1000, group: 'hari' },
+  { name: '美容鍼',             min: 15, price: 2000 },
+  { name: 'ドライヘッドスパ',   min: 10, price: 1000 },
   { name: '吸玉（カッピング）', min: 10, price: 1000 },
-   { name: '耳つぼシール', min: 10, price: 1800 },
+  { name: '耳ツボシール', min: 10, price: 1800 },
 ];
 const BED_KEYS = ['bed1', 'bed2', 'bed3'];
+const NEW_EXTRA_MIN = 10;
+const BUFFER_MIN = 10;   // 施術後に押さえる時間（GASのBUFFER_MINと同じ）
 // ---- 設定ここまで ----
 
 const DOW = ['日', '月', '火', '水', '木', '金', '土'];
-const NEW_EXTRA_MIN = 10;
-const BUFFER_MIN = 10;   // 施術後に押さえる時間（GASのBUFFER_MINと同じ）
-const state = { course: '', courseMin: 0, options: [], visit: '', date: '', time: '', name: '', email: '', tel: '', symptoms: '' };
-const selectedOpts = () => OPTIONS.filter(o => state.options.includes(o.name));
-const totalMin = () => state.courseMin + selectedOpts().reduce((a, o) => a + o.min, 0)
-  + (state.visit === '新規' ? NEW_EXTRA_MIN : 0);
-const updateNextBtn = () => { $('btn1').disabled = !(state.course && state.visit); };
-const optPrice = () => selectedOpts().reduce((a, o) => a + o.price, 0);
-const coursePrice = () => COURSE_PRICES[state.course] || 0;
-const totalPrice = () => coursePrice() + optPrice();
-const optLabel = () => selectedOpts().map(o => o.name).join('・');
-const yen = n => n.toLocaleString('ja-JP') + '円';
-let weekOffset = 0;
-let renderToken = 0;
-let openUntil = null;   // 予約受付の最終日（GASから取得。"" = 受付前）
-const busyPromise = {};  // 週の開始日 → 通信中/完了のPromise
-const busyData = {};     // 週の開始日 → 取得済みデータ
-
+const state = { course: '', options: [], visit: '', date: '', time: '', name: '', email: '', tel: '', symptoms: '' };
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2, '0');
+const yen = n => n.toLocaleString('ja-JP') + '円';
 const toDateStr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-const toTime = min => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
-const slotMs = (dateStr, time) => Date.parse(`${dateStr}T${time}:00+09:00`);
+const toTime = m => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+const slotMs = (ds, t) => Date.parse(`${ds}T${t}:00+09:00`);
 const todayStr = () => toDateStr(new Date());
+const selectedOpts = () => OPTIONS.filter(o => state.options.includes(o.name));
+const courseMin = () => state.course ? COURSES[state.course].min : 0;
+const totalMin = () => courseMin() + selectedOpts().reduce((a, o) => a + o.min, 0) + (state.visit === '新規' ? NEW_EXTRA_MIN : 0);
+const coursePrice = () => state.course ? COURSES[state.course].price : 0;
+const optPrice = () => selectedOpts().reduce((a, o) => a + o.price, 0);
+const optLabel = () => selectedOpts().map(o => o.name).join('・');
+const menuReady = () => !!(state.course && state.visit);
+const dateLabel = ds => { const d = new Date(ds + 'T00:00:00'); return `${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）`; };
+
+let weekOffset = 0, renderToken = 0, openUntil = null;
+const busyPromise = {}, busyData = {};
 
 function weekStart(offset) {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(); d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() - d.getDay() + offset * 7);
   return d;
 }
@@ -372,105 +323,83 @@ function loadBusy(offset, force) {
 }
 
 // ---- 空き判定（GASと同じルール） ----
-function isAvailable(dateStr, time, dur, busy) {
-  const s = slotMs(dateStr, time);
-  const e = s + (dur + BUFFER_MIN) * 60000;   // 施術＋確保時間で判定
-  if (busy.owner.some(r => r[0] < e && r[1] > s)) return false;           // 個人予定と重なる
-  if (BED_KEYS.some(k => busy.beds[k].some(r => r[0] === s))) return false; // 同じ開始時刻がある
-  if (BED_KEYS.some(k => busy.beds[k].some(r => r[0] < e && r[1] > s
-      && Math.abs(r[0] - s) % 3600000 === 1800000))) return false;          // 重なる予約と30分ずれ
-  return BED_KEYS.some(k => !busy.beds[k].some(r => r[0] < e && r[1] > s)); // 空きベッドがある
+function isAvailable(ds, t, dur, busy) {
+  const s = slotMs(ds, t);
+  const e = s + (dur + BUFFER_MIN) * 60000;
+  if (busy.owner.some(r => r[0] < e && r[1] > s)) return false;
+  if (BED_KEYS.some(k => busy.beds[k].some(r => r[0] === s))) return false;
+  if (BED_KEYS.some(k => busy.beds[k].some(r => r[0] < e && r[1] > s && Math.abs(r[0] - s) % 3600000 === 1800000))) return false;
+  return BED_KEYS.some(k => !busy.beds[k].some(r => r[0] < e && r[1] > s));
 }
 
-// ---- 画面遷移 ----
-function selectCourse(el, min, name) {
-  document.querySelectorAll('.course-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-  state.course = name;
-  state.courseMin = min;
-  state.date = '';
-  state.time = '';
-  updateNextBtn();
-  updateOptionTotal();
-}
-
+// ---- メニュー選択 ----
 $('visitGrid').addEventListener('click', e => {
-  const btn = e.target.closest('.option-btn');
+  const btn = e.target.closest('.choice');
   if (!btn) return;
   state.visit = btn.dataset.visit;
-  state.date = '';
-  state.time = '';
-  document.querySelectorAll('#visitGrid .option-btn').forEach(b => b.classList.toggle('selected', b === btn));
-  updateNextBtn();
-  updateOptionTotal();
+  document.querySelectorAll('#visitGrid .choice').forEach(b => b.classList.toggle('on', b === btn));
+  onMenuChange();
 });
+$('course').addEventListener('change', e => { state.course = e.target.value; onMenuChange(); });
 
 function renderOptions() {
-  $('optionGrid').innerHTML = OPTIONS.map(o => `
-    <button class="option-btn${state.options.includes(o.name) ? ' selected' : ''}" data-opt="${o.name}">
-      <span class="oname">${o.name}</span>
-      <span class="ometa">＋${o.min}分 ／ ${yen(o.price)}</span>
-    </button>`).join('');
+  $('optionList').innerHTML = OPTIONS.map((o, i) => `
+    <label class="opt-row"><input type="checkbox" id="opt${i}" data-opt="${o.name}" ${state.options.includes(o.name) ? 'checked' : ''}>
+      <span class="nm">${o.name}<small>＋${o.min}分</small></span><span class="pr">＋${yen(o.price)}</span></label>`).join('');
 }
-
-$('optionGrid').addEventListener('click', e => {
-  const btn = e.target.closest('.option-btn');
-  if (!btn) return;
-  const opt = OPTIONS.find(o => o.name === btn.dataset.opt);
-  if (state.options.includes(opt.name)) {
-    state.options = state.options.filter(n => n !== opt.name);
-  } else {
-    if (opt.group) {
-      const same = OPTIONS.filter(o => o.group === opt.group).map(o => o.name);
-      state.options = state.options.filter(n => !same.includes(n));
-    }
-    state.options.push(opt.name);
-  }
-  state.date = '';
-  state.time = '';
+$('optionList').addEventListener('change', e => {
+  const name = e.target.dataset.opt;
+  if (!name) return;
+  const opt = OPTIONS.find(o => o.name === name);
+  if (e.target.checked) {
+    if (opt.group) state.options = state.options.filter(n => (OPTIONS.find(o => o.name === n) || {}).group !== opt.group);
+    state.options.push(name);
+  } else state.options = state.options.filter(n => n !== name);
   renderOptions();
-  updateOptionTotal();
+  onMenuChange();
 });
 
-function updateOptionTotal() {
-  const box = $('optionTotal');
-  if (!state.courseMin) { box.style.display = 'none'; return; }
-  box.textContent = `お時間 ${totalMin()}分` + (state.visit === '新規' ? `（カウンセリング${NEW_EXTRA_MIN}分含む）` : '')
-    + `　／　料金合計 ${yen(totalPrice())}`;
-  box.style.display = 'block';
+function onMenuChange() {
+  const hadTime = !!state.time;
+  state.date = ''; state.time = '';
+  if (menuReady()) {
+    $('calPlaceholder').hidden = true;
+    $('calArea').hidden = false;
+    renderWeek();
+  }
+  updateAll(hadTime ? 'メニューを変更したため、日時をもう一度お選びください' : '');
 }
 
-function goPage(n, force) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  $('page' + n).classList.add('active');
-  for (let i = 1; i <= 4; i++) $('s' + i).classList.toggle('active', i === n);
-  window.scrollTo(0, 0);
-  if (n === 2) renderWeek(force);
-  if (n === 3 && state.date) {
-    const d = new Date(state.date + 'T00:00:00');
-    $('page3SlotInfo').textContent =
-      `${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）${state.time}〜　${state.course}` +
-      (state.options.length ? `＋${optLabel()}` : '') + `（${totalMin()}分・${yen(totalPrice())}）`;
-  }
+// ---- 表示の更新 ----
+function updateAll(msg) {
+  $('pCourse').textContent = yen(coursePrice());
+  $('pOption').textContent = yen(optPrice());
+  $('pTotal').textContent = yen(coursePrice() + optPrice());
+  $('pTime').textContent = state.course ? `施術時間 ${totalMin()}分${state.visit === '新規' ? '（カウンセリング含む）' : ''}` : '';
+  const pk = $('picked');
+  pk.textContent = state.date ? `${dateLabel(state.date)} ${state.time}〜　${state.course}${state.options.length ? '＋' + optLabel() : ''}` : '';
+  pk.classList.toggle('show', !!state.date);
+  const m = $('submitMsg');
+  m.textContent = msg || '';
+  m.classList.toggle('show', !!msg);
+  $('btnSubmit').disabled = !$('agree').checked;
 }
+$('agree').addEventListener('change', () => updateAll(''));
 
 // ---- 週カレンダー ----
 async function renderWeek(force) {
   const token = ++renderToken;
   const ws = toDateStr(weekStart(weekOffset));
   const days = [...Array(7)].map((_, i) => { const d = weekStart(weekOffset); d.setDate(d.getDate() + i); return d; });
-  const last = days[6];
-  $('weekLabel').textContent = `${days[0].getMonth() + 1}/${days[0].getDate()} 〜 ${last.getMonth() + 1}/${last.getDate()}`;
+  $('weekLabel').textContent = `${days[0].getMonth() + 1}/${days[0].getDate()} 〜 ${days[6].getMonth() + 1}/${days[6].getDate()}`;
   $('btnPrevWeek').disabled = weekOffset <= 0;
   $('calError').classList.remove('show');
-
   let busy = force ? null : busyData[ws];
   if (!busy) {
-    if (!$('calTable').innerHTML) drawTable(days, null);
+    drawTable(days, null);
     $('calLoading').classList.add('show');
-    try {
-      busy = await loadBusy(weekOffset, force);
-    } catch (e) {
+    try { busy = await loadBusy(weekOffset, force); }
+    catch (e) {
       if (token !== renderToken) return;
       $('calLoading').classList.remove('show');
       $('calError').classList.add('show');
@@ -481,117 +410,83 @@ async function renderWeek(force) {
   }
   drawTable(days, busy);
   updateOpenInfo();
-  if (!$('btnNextWeek').disabled) loadBusy(weekOffset + 1).catch(() => {}); // 次の週を先読み
+  if (!$('btnNextWeek').disabled) loadBusy(weekOffset + 1).catch(() => {});
 }
-
-function isNotOpen(ds) {
-  return openUntil !== null && (openUntil === '' || ds > openUntil);
-}
-
+const isNotOpen = ds => openUntil !== null && (openUntil === '' || ds > openUntil);
 function updateOpenInfo() {
   if (openUntil === null) { $('openNote').textContent = ''; return; }
   if (openUntil === '') {
-    $('openNote').textContent = '現在、次回のご予約受付の準備中です。恐れ入りますが、しばらくお待ちください。';
+    $('openNote').textContent = '現在、次回のご予約受付の準備中です。しばらくお待ちください。';
     $('btnNextWeek').disabled = true;
     return;
   }
-  const d = new Date(openUntil + 'T00:00:00');
-  $('openNote').textContent = `ご予約は${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）まで受付中です`;
+  $('openNote').textContent = `ご予約は${dateLabel(openUntil)}まで受付中です`;
   $('btnNextWeek').disabled = toDateStr(weekStart(weekOffset + 1)) > openUntil;
 }
-
 function drawTable(days, busy) {
   const today = todayStr();
   const dur = totalMin() || 30;
-
-  // 表示する時間行（どこかの営業日で収まる枠だけ）
   let minStart = Infinity, maxEnd = 0;
-  Object.values(BUSINESS_HOURS).forEach(h => {
-    if (!h) return;
-    minStart = Math.min(minStart, h.start * 60);
-    maxEnd = Math.max(maxEnd, h.end * 60);
-  });
-  const times = [];
-  for (let m = minStart; m + dur <= maxEnd; m += SLOT_MIN) times.push(m);
-
+  Object.values(BUSINESS_HOURS).forEach(h => { if (h) { minStart = Math.min(minStart, h.start * 60); maxEnd = Math.max(maxEnd, h.end * 60); } });
   let html = '<thead><tr><th></th>';
   for (const d of days) {
     const ds = toDateStr(d);
     const closed = !BUSINESS_HOURS[d.getDay()] || ds < today || isNotOpen(ds);
-    html += `<th class="${closed ? 'closed' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="date-num">${d.getDate()}</span></th>`;
+    html += `<th class="${closed ? 'closed' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="num">${d.getDate()}</span></th>`;
   }
   html += '</tr></thead><tbody>';
-
-  for (const m of times) {
+  for (let m = minStart; m + dur <= maxEnd; m += SLOT_MIN) {
     const t = toTime(m);
-    html += `<tr><td class="time-col">${t}</td>`;
+    html += `<tr><td class="time">${t}</td>`;
     for (const d of days) {
       const ds = toDateStr(d);
       const h = BUSINESS_HOURS[d.getDay()];
-      if (!h || ds < today || isNotOpen(ds)) { html += '<td class="closed-col"><span class="slot-dash">−</span></td>'; continue; }
-      if (m < h.start * 60 || m + dur > h.end * 60) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
-      if (slotMs(ds, t) < Date.now() + LEAD_HOURS * 3600000) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
+      if (!h || ds < today || isNotOpen(ds)) { html += '<td class="closed"><span class="slot-dash">−</span></td>'; continue; }
+      if (m < h.start * 60 || m + dur > h.end * 60 || slotMs(ds, t) < Date.now() + LEAD_HOURS * 3600000) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
       if (!busy) { html += '<td></td>'; continue; }
       if (isAvailable(ds, t, dur, busy)) {
-        const sel = state.date === ds && state.time === t ? ' selected' : '';
-        html += `<td><button class="slot${sel}" data-date="${ds}" data-time="${t}" aria-label="${ds} ${t} 空き">○</button></td>`;
-      } else {
-        html += '<td><span class="slot-x">×</span></td>';
-      }
+        const on = state.date === ds && state.time === t ? ' on' : '';
+        html += `<td><button class="slot${on}" data-date="${ds}" data-time="${t}" aria-label="${dateLabel(ds)} ${t} 空き">○</button></td>`;
+      } else html += '<td><span class="slot-x">×</span></td>';
     }
     html += '</tr>';
   }
-  html += '</tbody>';
-  $('calTable').innerHTML = html;
+  $('calTable').innerHTML = html + '</tbody>';
 }
-
 $('calTable').addEventListener('click', e => {
   const btn = e.target.closest('.slot');
   if (!btn) return;
-  document.querySelectorAll('.slot.selected').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
+  document.querySelectorAll('.slot.on').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
   state.date = btn.dataset.date;
   state.time = btn.dataset.time;
-  setTimeout(() => goPage(3), 150);
+  updateAll('');
+  setTimeout(() => $('fInfo').scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
 });
+function changeWeek(dir) { weekOffset = Math.max(0, weekOffset + dir); renderWeek(); }
 
-function changeWeek(dir) {
-  weekOffset = Math.max(0, weekOffset + dir);
-  renderWeek();
-}
-
-// ---- 入力・確認・送信 ----
-function goConfirm() {
-  const name = $('fname').value.trim();
-  const email = $('femail').value.trim();
-  const tel = $('ftel').value.trim();
+// ---- 送信（ボタン1回で予約確定） ----
+function validate() {
+  if (!state.visit) return { msg: '患者様区分をお選びください', el: 'fVisit' };
+  if (!state.course) return { msg: '予約メニューをお選びください', el: 'fCourse' };
+  if (!state.date) return { msg: 'ご希望日時（○）をお選びください', el: 'fDate' };
+  const name = $('fname').value.trim(), tel = $('ftel').value.trim(), email = $('femail').value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   $('err-name').classList.toggle('show', !name);
-  $('err-email').classList.toggle('show', !emailOk);
   $('err-tel').classList.toggle('show', !tel);
-  if (!name || !emailOk || !tel) return;
-  const symptoms = $('fsymptoms').value.trim();
-  Object.assign(state, { name, email, tel, symptoms });
-
-  const d = new Date(state.date + 'T00:00:00');
-  $('c-course').textContent = `${state.course}（${yen(coursePrice())}）`;
-  $('c-price').textContent = yen(totalPrice());
-  $('c-options').textContent = state.options.length ? `${optLabel()}（${yen(optPrice())}）` : 'なし';
-  $('c-duration').textContent = `${totalMin()}分` + (state.visit === '新規' ? `（カウンセリング${NEW_EXTRA_MIN}分含む）` : '');
-  $('c-visit').textContent = state.visit === '新規' ? 'はじめて' : '2回目以降';
-  $('c-date').textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）`;
-  $('c-time').textContent = `${state.time}〜`;
-  $('c-name').textContent = name;
-  $('c-email').textContent = email;
-  $('c-tel').textContent = tel;
-  $('c-symptoms').textContent = symptoms || '記入なし';
-  goPage(4);
+  $('err-email').classList.toggle('show', !emailOk);
+  if (!name || !tel || !emailOk) return { msg: 'お客様情報をご入力ください', el: 'fInfo' };
+  Object.assign(state, { name, tel, email, symptoms: $('fsymptoms').value.trim() });
+  return null;
 }
-
 async function submitBooking() {
+  const bad = validate();
+  if (bad) { updateAll(bad.msg); $(bad.el).scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   const btn = $('btnSubmit');
   btn.disabled = true;
-  btn.textContent = '送信中…';
+  btn.textContent = '予約しています…';
+  updateAll('');
+  btn.disabled = true;
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -602,29 +497,30 @@ async function submitBooking() {
     });
     const data = await res.json();
     if (data.success) { showDone(); return; }
-    alert(data.message || 'ご予約を完了できませんでした。');
     state.date = ''; state.time = '';
-    goPage(2, true); // 最新の空き状況で選び直し
+    updateAll(data.message || 'ご予約を完了できませんでした。別の日時をお選びください。');
+    renderWeek(true);
+    $('fDate').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
-    alert(`通信エラーが発生しました。\n確認メールが届いていない場合は、もう一度お試しいただくか、お電話にてご連絡ください。\nTEL: ${CLINIC_TEL}`);
+    updateAll(`通信エラーが発生しました。確認メールが届いていない場合は、もう一度お試しいただくか、お電話にてご連絡ください。\nTEL: ${CLINIC_TEL}`);
   } finally {
-    btn.disabled = false;
-    btn.textContent = '予約を確定する';
+    btn.textContent = 'ご予約を確定する';
+    btn.disabled = !$('agree').checked;
   }
 }
-
 function showDone() {
-  $('stepsBar').style.display = 'none';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  $('doneScreen').style.display = 'block';
+  const d = new Date(state.date + 'T00:00:00');
+  $('doneDetail').textContent = `${d.getFullYear()}年${dateLabel(state.date)} ${state.time}〜\n${state.course}${state.options.length ? '＋' + optLabel() : ''}\n合計 ${yen(coursePrice() + optPrice())}`;
+  $('form').hidden = true;
+  $('done').style.display = 'block';
   window.scrollTo(0, 0);
 }
 
 renderOptions();
+updateAll('');
 $('fsymptoms').addEventListener('input', e => { $('symCount').textContent = e.target.value.length; });
-
-// ページを開いた瞬間に今週分の読み込みを開始
-loadBusy(0).catch(() => {});
+loadBusy(0).catch(() => {});   // 開いた瞬間に今週分の読み込みを開始
 </script>
 </body>
 </html>
+index.html を表示しています。
