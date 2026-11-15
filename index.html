@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -12,6 +13,7 @@
     --text: #2A2118; --text-sub: #5C4C38; --text-muted: #9A8B78;
     --accent: #8A6E4F; --accent-ink: #FFFFFF; --accent-soft: #EFE7DC;
     --line: #E3DBCF; --line-strong: #CDBFAC; --note-line: #E2CDB8; --danger: #A04040;
+    --staff-bg: #EEF3EE; --staff-ink: #4F6B55; --staff-line: #CFDDD1;
     --serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', serif;
     --sans: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', sans-serif;
   }
@@ -19,12 +21,12 @@
     --page: #17140F; --card: #221D16; --field: #2A241C; --soft: #2A241C; --note-bg: #2A2219;
     --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
     --accent: #C4A27A; --accent-ink: #1C1810; --accent-soft: #3A3020;
-    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; color-scheme: dark; } }
+    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; --staff-bg: #1F2A22; --staff-ink: #A9C7AE; --staff-line: #34473A; color-scheme: dark; } }
   :root[data-theme="dark"] {
     --page: #17140F; --card: #221D16; --field: #2A241C; --soft: #2A241C; --note-bg: #2A2219;
     --text: #F2EDE4; --text-sub: #CDBD9E; --text-muted: #948668;
     --accent: #C4A27A; --accent-ink: #1C1810; --accent-soft: #3A3020;
-    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; color-scheme: dark; }
+    --line: #3D3426; --line-strong: #5A4E38; --note-line: #5A4632; --staff-bg: #1F2A22; --staff-ink: #A9C7AE; --staff-line: #34473A; color-scheme: dark; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--page); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.7;
@@ -94,6 +96,14 @@
   .cal-overlay button { margin-top: 0.6rem; font: inherit; font-size: 0.9rem; padding: 0.45rem 1.1rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--field); color: var(--text-sub); cursor: pointer; }
   .picked { display: none; margin-top: 0.8rem; background: var(--accent-soft); color: var(--accent); font-weight: 700; border-radius: 12px; padding: 0.8rem 1rem; text-align: center; }
   .picked.show { display: block; }
+  .picked .who { display: block; font-size: 0.9rem; margin-top: 0.15rem; }
+  .cal-table .st { background: var(--staff-bg); }
+  .cal-table th.st .who { display: block; font-size: 0.68rem; font-weight: 700; color: var(--staff-ink); letter-spacing: 0.05em; }
+  .legend .st-mk { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--staff-ink); background: var(--staff-bg); border: 1px solid var(--staff-line); border-radius: 4px; padding: 0 0.35rem; margin-right: 0.3rem; }
+  #staffIntro { margin-top: 0.6rem; }
+  #staffIntro .intro-lbl { display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: var(--staff-ink); margin-bottom: 0.25rem; }
+  #staffIntro .intro-lbl::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--staff-ink); }
+  .staff-note { font-size: 0.88rem; color: var(--text-sub); background: var(--staff-bg); border: 1px solid var(--staff-line); border-radius: 10px; padding: 0.6rem 0.85rem; margin-bottom: 0.6rem; }
 
   .err { display: none; color: var(--danger); font-size: 0.85rem; font-weight: 600; margin-top: 0.4rem; }
   .err.show { display: block; }
@@ -135,7 +145,7 @@
   <header>
     <p class="eyebrow">NODE. OMIYA</p>
     <h1>鍼灸院node.OMIYA</h1>
-    <p class="tagline">さいたま市大宮区大成町3丁目614－3　鉄道博物館駅10分</p>
+    <p class="tagline">さいたま市大宮区大成町3-614-3　近隣にコインパーキングあり</p>
   </header>
 
   <div id="form">
@@ -154,11 +164,13 @@
       <div class="select-wrap">
         <select id="course">
           <option value="">選択してください</option>
-          <option value="30分コース">30分コース（4,500円）体験・軽めのケアに</option>
+          <option value="30分コース">30分コース（4,500円）体験・ポイントケアに</option>
           <option value="50分コース">50分コース（6,500円）標準・全身の調整に</option>
-          <option value="80分コース">80分コース（9,000円）じっくり・慢性症状・自律神経ケアに</option>
+          <option value="80分コース">80分コース（9,000円）じっくり・慢性疲労・自律神経ケアに</option>
+          <option value="佐藤先生 50分コース">【土曜限定】佐藤先生 50分コース（6,500円）</option>
         </select>
       </div>
+      <p class="hint">※日曜〜金曜は院長 中西、土曜日は佐藤先生のコースのみご予約いただけます</p>
     </div>
 
     <!-- 追加オプション -->
@@ -182,6 +194,7 @@
           <span><span class="mk">○</span>空き</span>
           <span><span class="mk x">×</span>予約済</span>
           <span><span class="mk x">−</span>受付なし</span>
+          <span><span class="st-mk">スタッフ</span>スタッフ 佐藤の担当日</span>
         </div>
         <p class="open-note" id="openNote"></p>
         <div class="cal-box">
@@ -191,6 +204,7 @@
         </div>
       </div>
       <p class="picked" id="picked"></p>
+      <div class="staff-note" id="staffIntro" hidden></div>
     </div>
 
     <!-- お客様情報 -->
@@ -227,9 +241,10 @@
     <div class="notice">
       <h2>【ご予約前の確認事項】</h2>
       <ul>
+        <li><b>日曜〜金曜は院長 中西</b>、<b>土曜はスタッフ 佐藤</b>が担当いたします。</li>
         <li>当院は少人数で営んでいるため、<b>お待たせしてしまうことがございます</b>。<b>施術後のご予定には、時間に余裕をもたせて</b>いただけますと幸いです。</li>
         <li><b>キャンセル・変更は前日まで</b>、確認メールのリンクから承ります。<b>当日のキャンセル</b>は、<b>お電話またはショートメッセージ</b>（090-6289-5132）にてご連絡ください。施術中はお電話に出られないことがございますので、ショートメッセージもご利用ください。</li>
-        <li>鍼の反応や内出血のリスクがあるため、<b>海外旅行や大事なご予定の前（結婚式など）</b>の前日は施術をお控えください。</li>
+        <li>施術後の体の反応を考え、<b>大事なご予定や海外旅行の前日</b>のご来院はお控えいただきますようお願いいたします。</li>
       </ul>
       <label class="agree"><input type="checkbox" id="agree"> 上記の確認事項に同意しました</label>
     </div>
@@ -262,7 +277,14 @@ const BUSINESS_HOURS = {
 };
 const LEAD_HOURS = 2;   // 当日予約は開始の何時間前まで（GASのBOOKING_LEAD_HOURSと同じ）
 const SLOT_MIN = 15;
-const COURSES = { '30分コース': { min: 30, price: 4500 }, '50分コース': { min: 50, price: 6500 }, '80分コース': { min: 80, price: 9000 } };
+// days：予約できる曜日（0=日,…,6=土）GASの COURSE_DAYS と同じ
+const COURSES = {
+  '30分コース':          { min: 30, price: 4500, days: [0, 1, 2, 3, 4, 5] },
+  '50分コース':          { min: 50, price: 6500, days: [0, 1, 2, 3, 4, 5] },
+  '80分コース':          { min: 80, price: 9000, days: [0, 1, 2, 3, 4, 5] },
+  '佐藤先生 50分コース': { min: 50, price: 6500, days: [6] },
+};
+const courseDayOk = d => !state.course || !COURSES[state.course].days || COURSES[state.course].days.includes(d.getDay());
 // オプション（group が同じものはどちらか1つだけ）
 const OPTIONS = [
   { name: '鍼追加2倍',          min: 10, price: 500,  group: 'hari' },
@@ -270,10 +292,14 @@ const OPTIONS = [
   { name: '美容鍼',             min: 15, price: 2000 },
   { name: 'ドライヘッドスパ',   min: 10, price: 1000 },
   { name: '吸玉（カッピング）', min: 10, price: 1000 },
-  { name: '耳ツボシール', min: 10, price: 1800 },
 ];
 const BED_KEYS = ['bed1', 'bed2', 'bed3'];
 const NEW_EXTRA_MIN = 10;
+// 担当者（曜日ごと）0=日,…,6=土。書いていない曜日は STAFF_DEFAULT（GASのCONFIGと同じ）
+const STAFF_DEFAULT = '院長 中西';
+const STAFF_BY_DOW = { 6: 'スタッフ 佐藤' };
+// その曜日の日時を選んだときだけ表示する紹介文（空欄なら表示しない）
+const STAFF_INTRO = { 6: { title: '土曜担当　佐藤先生のご紹介', text: 'お一人おひとりのお悩みに丁寧に耳を傾け、体の状態に合わせた施術を心がけています。初めての方も安心してご相談ください。' } };
 const BUFFER_MIN = 10;   // 施術後に押さえる時間（GASのBUFFER_MINと同じ）
 // ---- 設定ここまで ----
 
@@ -293,6 +319,8 @@ const coursePrice = () => state.course ? COURSES[state.course].price : 0;
 const optPrice = () => selectedOpts().reduce((a, o) => a + o.price, 0);
 const optLabel = () => selectedOpts().map(o => o.name).join('・');
 const menuReady = () => !!(state.course && state.visit);
+const staffOf = ds => STAFF_BY_DOW[new Date(ds + 'T00:00:00').getDay()] || STAFF_DEFAULT;
+const isStaffDay = d => d.getDay() in STAFF_BY_DOW;
 const dateLabel = ds => { const d = new Date(ds + 'T00:00:00'); return `${d.getMonth() + 1}月${d.getDate()}日（${DOW[d.getDay()]}）`; };
 
 let weekOffset = 0, renderToken = 0, openUntil = null;
@@ -377,7 +405,10 @@ function updateAll(msg) {
   $('pTotal').textContent = yen(coursePrice() + optPrice());
   $('pTime').textContent = state.course ? `施術時間 ${totalMin()}分${state.visit === '新規' ? '（カウンセリング含む）' : ''}` : '';
   const pk = $('picked');
-  pk.textContent = state.date ? `${dateLabel(state.date)} ${state.time}〜　${state.course}${state.options.length ? '＋' + optLabel() : ''}` : '';
+  pk.innerHTML = state.date ? `${dateLabel(state.date)} ${state.time}〜　${state.course}${state.options.length ? '＋' + optLabel() : ''}<span class="who">担当：${staffOf(state.date)}</span>` : '';
+  const intro = state.date ? STAFF_INTRO[new Date(state.date + 'T00:00:00').getDay()] : '';
+  $('staffIntro').innerHTML = intro ? `<div class="intro-lbl">${intro.title}</div><div>${intro.text}</div>` : '';
+  $('staffIntro').hidden = !intro;
   pk.classList.toggle('show', !!state.date);
   const m = $('submitMsg');
   m.textContent = msg || '';
@@ -431,8 +462,8 @@ function drawTable(days, busy) {
   let html = '<thead><tr><th></th>';
   for (const d of days) {
     const ds = toDateStr(d);
-    const closed = !BUSINESS_HOURS[d.getDay()] || ds < today || isNotOpen(ds);
-    html += `<th class="${closed ? 'closed' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="num">${d.getDate()}</span></th>`;
+    const closed = !BUSINESS_HOURS[d.getDay()] || ds < today || isNotOpen(ds) || !courseDayOk(d);
+    html += `<th class="${closed ? 'closed' : ''}${isStaffDay(d) ? ' st' : ''}"><span class="dow">${DOW[d.getDay()]}</span><span class="num">${d.getDate()}</span>${isStaffDay(d) ? '<span class="who">スタッフ</span>' : ''}</th>`;
   }
   html += '</tr></thead><tbody>';
   for (let m = minStart; m + dur <= maxEnd; m += SLOT_MIN) {
@@ -441,7 +472,7 @@ function drawTable(days, busy) {
     for (const d of days) {
       const ds = toDateStr(d);
       const h = BUSINESS_HOURS[d.getDay()];
-      if (!h || ds < today || isNotOpen(ds)) { html += '<td class="closed"><span class="slot-dash">−</span></td>'; continue; }
+      if (!h || ds < today || isNotOpen(ds) || !courseDayOk(d)) { html += '<td class="closed"><span class="slot-dash">−</span></td>'; continue; }
       if (m < h.start * 60 || m + dur > h.end * 60 || slotMs(ds, t) < Date.now() + LEAD_HOURS * 3600000) { html += '<td><span class="slot-dash">−</span></td>'; continue; }
       if (!busy) { html += '<td></td>'; continue; }
       if (isAvailable(ds, t, dur, busy)) {
@@ -452,6 +483,11 @@ function drawTable(days, busy) {
     html += '</tr>';
   }
   $('calTable').innerHTML = html + '</tbody>';
+  // 担当がスタッフの曜日の列に色をつける
+  days.forEach((d, i) => {
+    if (!isStaffDay(d)) return;
+    $('calTable').querySelectorAll(`tbody tr td:nth-child(${i + 2})`).forEach(td => td.classList.add('st'));
+  });
 }
 $('calTable').addEventListener('click', e => {
   const btn = e.target.closest('.slot');
@@ -510,7 +546,7 @@ async function submitBooking() {
 }
 function showDone() {
   const d = new Date(state.date + 'T00:00:00');
-  $('doneDetail').textContent = `${d.getFullYear()}年${dateLabel(state.date)} ${state.time}〜\n${state.course}${state.options.length ? '＋' + optLabel() : ''}\n合計 ${yen(coursePrice() + optPrice())}`;
+  $('doneDetail').textContent = `${d.getFullYear()}年${dateLabel(state.date)} ${state.time}〜\n${state.course}${state.options.length ? '＋' + optLabel() : ''}\n担当：${staffOf(state.date)}\n合計 ${yen(coursePrice() + optPrice())}`;
   $('form').hidden = true;
   $('done').style.display = 'block';
   window.scrollTo(0, 0);
